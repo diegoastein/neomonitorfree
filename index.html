@@ -610,7 +610,7 @@
 
                     <div className="mt-auto space-y-4">
                         <div className="text-center">
-                            <p className="text-slate-500 text-sm mb-4">Ingrese el ID que figura junto al código QR</p>
+                            <p className="text-slate-500 text-sm mb-4">Si el scaner no funciona ingrese el ID que figura junto al código QR</p>
                             <div className="flex gap-2">
                                 <input type="number" placeholder="Ingrese ID" value={sid} onChange={e => setSid(e.target.value)} className="flex-1 bg-slate-800 border border-slate-700 p-4 rounded-xl text-center font-mono text-xl outline-none focus:border-blue-500"/>
                                 <button onClick={() => sid && onScan(sid)} className="bg-blue-600 p-4 rounded-xl px-6 font-bold"><Icons.ArrowRight/></button>
