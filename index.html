@@ -3,7 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeoMonitor (Free Edition)</title>
+    
+    <!-- SEO & Meta Tags de Repositorio -->
+    <title>NeoMonitor | Simulador Neonatal de Signos Vitales Online</title>
+    <meta name="description" content="Simulador neonatal profesional para entrenamiento en RCP. Convierte cualquier dispositivo en un monitor de signos vitales con control remoto. Desarrollado por el Dr. Diego Steinberg.">
+    <meta name="keywords" content="simulador neonatal, RCP neonatal, monitor signos vitales, reanimación neonatal, capacitación médica, Diego Steinberg, simulación clínica">
+    <meta name="author" content="Dr. Diego Steinberg">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="NeoMonitor - Simulador Neonatal Profesional">
+    <meta property="og:description" content="Entrenamiento de alta fidelidad sin equipos costosos. Usalo gratis en neomonitor.pro">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://neomonitor.pro">
     
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DK9H6YBTY9"></script>
@@ -141,6 +152,7 @@
 
         const { useState, useEffect, useRef, useMemo } = React;
 
+        // Diccionario de traducciones para internacionalización
         const TRANSLATIONS = {
             es: {
                 loading: "Cargando NeoMonitor...", connecting: "CONECTANDO...", bed: "CAMA", mute: "Silenciar",
@@ -250,8 +262,6 @@
             const dataRef = useRef([]);
             const phaseRef = useRef(0);
             const lastTimeRef = useRef(performance.now());
-            
-            // Variabilidad morfológica: factores aleatorios por latido
             const pulseVariability = useRef({ amplitude: 1, width: 1 });
 
             useEffect(() => {
@@ -276,10 +286,9 @@
                         phaseRef.current += (beatsPerSecond * 2 * Math.PI) * deltaTime;
                         if (phaseRef.current >= 2 * Math.PI) {
                             phaseRef.current -= 2 * Math.PI;
-                            // Al inicio de cada ciclo, generamos nueva variabilidad morfológica
                             pulseVariability.current = {
-                                amplitude: 0.85 + Math.random() * 0.3, // ±15% de altura
-                                width: 0.95 + Math.random() * 0.1      // ±5% de ancho (anestesia sutil)
+                                amplitude: 0.85 + Math.random() * 0.3,
+                                width: 0.95 + Math.random() * 0.1
                             };
                         }
                         const p = phaseRef.current;
@@ -300,7 +309,6 @@
                                 newValue = (canvas.height / 2) + (Math.random() * 1.5 - 0.75);
                             }
                         } else {
-                            // Onda Pleth / Sat: sinusoidal modificada
                             newValue = (canvas.height / 2) - (Math.sin(p) * baseAmplitude * 0.6 * amplitude);
                         }
                     } else { newValue = (canvas.height / 2) + (Math.random() * 2 - 1); }
@@ -352,8 +360,6 @@
             const [alarmState, setAlarmState] = useState('none');
             const [flash, setFlash] = useState(false);
             const [qrExpanded, setQrExpanded] = useState(false);
-            
-            // Variabilidad numérica (Jitter) para la FC en pantalla
             const [hrDrift, setHrDrift] = useState(0);
 
             useEffect(() => {
@@ -361,7 +367,6 @@
                 return () => clearInterval(t);
             }, []);
 
-            // Efecto de Jitter fisiológico aleatorio cada 3-5 segundos
             useEffect(() => {
                 if (!vitals.simRunning) { setHrDrift(0); return; }
                 const driftInterval = setInterval(() => {
