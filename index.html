@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- SEO & Meta Tags de Repositorio -->
-    <title>NeoMonitor | Simulador Neonatal de Signos Vitales Online</title>
-    <meta name="description" content="Simulador neonatal profesional para entrenamiento en RCP. Convierte cualquier dispositivo en un monitor de signos vitales con control remoto. Desarrollado por el Dr. Diego Steinberg.">
-    <meta name="keywords" content="simulador neonatal, RCP neonatal, monitor signos vitales, reanimación neonatal, capacitación médica, Diego Steinberg, simulación clínica">
+    <!-- SEO & Meta Tags -->
+    <title>NeoMonitor | Simulador Multidisciplinario de Signos Vitales</title>
+    <meta name="description" content="Simulador neonatal, pediátrico y de adultos profesional para entrenamiento en RCP. Convierte cualquier dispositivo en un monitor de signos vitales con control remoto. Desarrollado por el Dr. Diego Steinberg.">
+    <meta name="keywords" content="simulador neonatal, RCP neonatal, monitor signos vitales, reanimación neonatal, capacitación médica, Diego Steinberg, simulación clínica, RCP adultos">
     <meta name="author" content="Dr. Diego Steinberg">
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:title" content="NeoMonitor - Simulador Neonatal Profesional">
+    <!-- Open Graph -->
+    <meta property="og:title" content="NeoMonitor - Simulador Profesional">
     <meta property="og:description" content="Entrenamiento de alta fidelidad sin equipos costosos. Usalo gratis en neomonitor.pro">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://neomonitor.pro">
     
-    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DK9H6YBTY9"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -25,13 +24,8 @@
       gtag('config', 'G-DK9H6YBTY9');
 
       function trackNeoEvent(eventName, label, details = {}) {
-        console.log(`[GA Event] Evento: ${eventName} | Label: ${label}`, details);
         if (typeof gtag === 'function') {
-          gtag('event', eventName, {
-            'event_label': label,
-            'event_category': 'NeoMonitor_Engagement',
-            ...details
-          });
+          gtag('event', eventName, { 'event_label': label, 'event_category': 'NeoMonitor_Engagement', ...details });
         }
       }
     </script>
@@ -46,12 +40,10 @@
     <script crossorigin="anonymous" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script crossorigin="anonymous" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     
-    <!-- QR Scan Library -->
     <script src="https://unpkg.com/html5-qrcode"></script>
     
     <style>
         body { background-color: #000000; color: white; margin: 0; touch-action: manipulation; overflow: hidden; font-family: sans-serif; }
-        
         .soft-key {
             background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
             border: 1px solid #475569; color: #cbd5e1; font-family: monospace;
@@ -60,90 +52,45 @@
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
         }
         .soft-key:active { background: #0f172a; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-
         input[type=range] { accent-color: #42B334; }
         input[type=range].time-slider { accent-color: #f59e0b; }
-        
-        .sponsor-container {
-            background: transparent;
-            border: 1px solid rgba(71, 85, 105, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            transition: all 0.3s;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        .sponsor-container:hover { background: rgba(255,255,255,0.05); border-color: #475569; }
-
+        .sponsor-container { border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; cursor: pointer; }
         .hardware-accelerated { transform: translateZ(0); will-change: transform, opacity; }
-        
         @keyframes zoomIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .animate-zoom { animation: zoomIn 0.3s ease-out forwards; }
-
-        @keyframes deviceFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .float-anim { animation: deviceFloat 3s ease-in-out infinite; }
-        
         @keyframes scanLine { 0% { top: 0; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
         .scan-line { position: absolute; width: 100%; height: 2px; background: #3b82f6; animation: scanLine 2s linear infinite; }
-
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            15% { transform: scale(1.25); }
-            30% { transform: scale(1); }
-            45% { transform: scale(1.15); }
-            60% { transform: scale(1); }
-            100% { transform: scale(1); }
-        }
-
+        @keyframes heartbeat { 0% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } 100% { transform: scale(1); } }
         .heart-portrait { display: none; }
-
         @media (max-width: 600px) and (orientation: portrait) {
             .monitor-screen { border-width: 4px !important; }
             .waveform-col { display: none !important; }
             .monitor-screen .main-row { grid-template-columns: 1fr !important; }
-            .monitor-screen .number-container { align-items: center !important; padding-right: 0 !important; justify-content: center !important; }
-            .monitor-screen .number-label { font-size: 1.2rem !important; margin-bottom: 0px !important; }
             .monitor-screen .number-display { font-size: 22vw !important; }
-            .monitor-screen .extra-info-row { grid-template-columns: 1fr 1fr !important; }
-            .monitor-screen .sponsor-col { display: none !important; }
-            .monitor-screen .qr-button span { display: inline !important; font-size: 0.7rem !important; }
             .heart-portrait { display: block !important; }
         }
-
         @media (max-height: 500px) and (orientation: landscape) {
             .monitor-screen { border-width: 4px !important; }
-            .monitor-screen .top-bar, .monitor-screen .bottom-bar { padding: 0.2rem 0.5rem !important; font-size: 0.7rem !important; height: 32px !important; }
-            .monitor-screen .main-row { grid-template-columns: 1fr 160px !important; }
             .monitor-screen .number-display { font-size: 15vh !important; }
         }
-
-        .qr-button { background: linear-gradient(180deg, #166534 0%, #14532d 100%); border-color: #22c55e; color: #bbf7d0; }
-        #reader { width: 100% !important; border: none !important; }
-        #reader video { border-radius: 12px !important; object-fit: cover !important; }
     </style>
 </head>
 <body>
     <div id="root">
         <div style="height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #42B334;">
-            <svg style="animation: spin 1s linear infinite; width: 40px; height: 40px; margin-bottom: 20px;" viewBox="0 0 24 24">
-                <circle style="opacity: 0.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                <path style="opacity: 0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <h2 style="font-weight: bold;">Loading NeoMonitor...</h2>
-            <style>@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style>
+            <h2 style="font-weight: bold;">NeoMonitor</h2>
         </div>
     </div>
 
     <script type="text/babel">
-       const firebaseConfig = {
-          apiKey: "AIzaSyA46SqiHL-U13mdaJnee-KhD372aWc5h2E",
-          authDomain: "monitor-36c41.firebaseapp.com",
-          projectId: "monitor-36c41",
-          storageBucket: "monitor-36c41.firebasestorage.app",
-          messagingSenderId: "830562769122",
-          appId: "1:830562769122:web:1db7060de0c80556db66bb"
+        // --- 1. INICIALIZACIÓN DE FIREBASE (GLOBAL) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyA46SqiHL-U13mdaJnee-KhD372aWc5h2E",
+            authDomain: "monitor-36c41.firebaseapp.com",
+            projectId: "monitor-36c41",
+            storageBucket: "monitor-36c41.firebasestorage.app",
+            messagingSenderId: "830562769122",
+            appId: "1:830562769122:web:1db7060de0c80556db66bb"
         };
 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
@@ -152,117 +99,105 @@
 
         const { useState, useEffect, useRef, useMemo } = React;
 
-        // Diccionario de traducciones para internacionalización
+        // --- 2. CONSTANTES GLOBALES ---
+        const DEFAULT_VITALS = { 
+            hr: 122, spo2: 91, resp: 45, patientType: 'neonatal', 
+            alarmMuted: false, connected: true, transition: null, 
+            soundTimestamp: 0, soundType: null, simRunning: false 
+        };
+
+        const PATIENT_PROFILES = {
+            neonatal: { label: { es: "Neonatal", en: "Neonatal", pt: "Neonatal" }, maxHr: 220, brady: 100, crit: 60, tachy: 180, normalHr: 140, tag: "NEONATAL" },
+            pediatric: { label: { es: "Pediátrico", en: "Pediatric", pt: "Pediátrico" }, maxHr: 180, brady: 60, crit: 40, tachy: 140, normalHr: 90, tag: "PEDIATRIC" },
+            adult: { label: { es: "Adulto", en: "Adult", pt: "Adulto" }, maxHr: 150, brady: 50, crit: 30, tachy: 120, normalHr: 75, tag: "ADULT CARE" }
+        };
+
         const TRANSLATIONS = {
-            es: {
-                loading: "Cargando NeoMonitor...", connecting: "CONECTANDO...", bed: "CAMA", mute: "Silenciar",
-                menu: "Menú", link: "VINCULAR", simNotStarted: "Simulación sin iniciar", id: "ID", sessionId: "ID SESIÓN",
-                scanPrompt: "Escanea para conectar el control o espera comando...", scanManual: "Ingrese el ID que figura junto al código QR",
-                placeholderId: "Ingrese ID", scanCamera: "Escanear Monitor", scanPhonePrompt: "Escanea con tu celular para usarlo como control remoto",
-                startMonitorBtn: "TOCAR PARA INICIAR MONITOR", mainPrompt: "Abrir esta app en los dos dispositivos",
-                useAsMonitor: "Usar este dispositivo como Monitor", useAsControl: "Usar este dispositivo como Control",
-                howToConnect: "¿Cómo conectar? (Ver guía)", guideTitle: "Guía de Conexión", step1: "Paso 1", step2: "Paso 2",
-                guideStep1: "Elige MONITOR en tu Tablet o PC", guideStep2: "Elige CONTROL en tu Celular y escanea el QR",
-                guideBtn: "Entendido, ¡empezar!", control: "Control", debriefing: "Debriefing", endSim: "FINALIZAR SIMULACIÓN",
-                startSim: "COMENZAR SIMULACIÓN", transition: "Transición", hr: "FC", act: "Act",
-                presets: { normal: "Normal", brady: "Bradicardia", desat: "Desaturación", grunt: "Quejido", vpp: "VPP", vpp_ct: "VPP + Masaje" }
-            },
-            en: {
-                loading: "Loading NeoMonitor...", connecting: "CONNECTING...", bed: "BED", mute: "Mute",
-                menu: "Menu", link: "LINK", simNotStarted: "Simulation not started", id: "ID", sessionId: "SESSION ID",
-                scanPrompt: "Scan to connect control or wait for command...", scanManual: "Enter the ID shown next to the QR code",
-                placeholderId: "Enter ID", scanCamera: "Scan Monitor", scanPhonePrompt: "Scan with your phone to use as a remote control",
-                startMonitorBtn: "TAP TO START MONITOR", mainPrompt: "Open this app on both devices",
-                useAsMonitor: "Use this device as Monitor", useAsControl: "Use this device as Control",
-                howToConnect: "How to connect? (View guide)", guideTitle: "Connection Guide", step1: "Step 1", step2: "Step 2",
-                guideStep1: "Choose MONITOR on your Tablet or PC", guideStep2: "Choose CONTROL on your Phone and scan the QR",
-                guideBtn: "Understood, start!", control: "Control", debriefing: "Debriefing", endSim: "END SIMULATION",
-                startSim: "START SIMULATION", transition: "Transition", hr: "HR", act: "Act",
-                presets: { normal: "Normal", brady: "Bradycardia", desat: "Desaturation", grunt: "Grunt", vpp: "PPV", vpp_ct: "PPV + Massage" }
-            },
-            pt: {
-                loading: "Carregando NeoMonitor...", connecting: "CONECTANDO...", bed: "LEITO", mute: "Silenciar",
-                menu: "Menu", link: "VINCULAR", simNotStarted: "Simulação não iniciada", id: "ID", sessionId: "ID DA SESSÃO",
-                scanPrompt: "Escaneie para conectar o controle ou aguarde o comando...", scanManual: "Insira o ID que aparece ao lado do código QR",
-                placeholderId: "Insira o ID", scanCamera: "Escanear Monitor", scanPhonePrompt: "Escaneie com seu celular para usá-lo como controle remoto",
-                startMonitorBtn: "TOCAR PARA INICIAR MONITOR", mainPrompt: "Abra este aplicativo nos dois dispositivos",
-                useAsMonitor: "Usar este dispositivo como Monitor", useAsControl: "Usar este dispositivo como Controle",
-                howToConnect: "Como conectar? (Ver guia)", guideTitle: "Guia de Conexão", step1: "Passo 1", step2: "Passo 2",
-                guideStep1: "Escolha MONITOR no seu Tablet ou PC", guideStep2: "Escolha CONTROLE no seu celular e escaneie o QR",
-                guideBtn: "Entendido, vamos começar!", control: "Controle", debriefing: "Debriefing", endSim: "FINALIZAR SIMULAÇÃO",
-                startSim: "INICIAR SIMULAÇÃO", transition: "Transição", hr: "FC", act: "Atu",
-                presets: { normal: "Normal", brady: "Bradicardia", desat: "Dessaturação", grunt: "Gemido", vpp: "VPP", vpp_ct: "VPP + Massagem" }
-            }
+            es: { loading: "Cargando NeoMonitor...", connecting: "CONECTANDO...", bed: "CAMA", mute: "Silenciar", menu: "Menú", link: "VINCULAR", simNotStarted: "Simulación sin iniciar", id: "ID", sessionId: "ID SESIÓN", scanPrompt: "Escanea para conectar el control...", scanManual: "ID del código QR", placeholderId: "Ingrese ID", scanCamera: "Escanear Monitor", scanPhonePrompt: "Escanea con tu celular para usarlo como control remoto", startMonitorBtn: "TOCAR PARA INICIAR MONITOR", mainPrompt: "Abrir esta app en los dos dispositivos", useAsMonitor: "Usar este dispositivo como Monitor", useAsControl: "Usar este dispositivo como Control", howToConnect: "¿Cómo conectar? (Ver guía)", guideTitle: "Guía de Conexión", step1: "Paso 1", step2: "Paso 2", guideStep1: "Elige MONITOR en tu Tablet o PC", guideStep2: "Elige CONTROL en tu Celular y escanea el QR", guideBtn: "Entendido, ¡empezar!", control: "Control", debriefing: "Debriefing", endSim: "FINALIZAR SIMULACIÓN", startSim: "COMENZAR SIMULACIÓN", transition: "Transición", hr: "FC", act: "Act", presets: { normal: "Normal", brady: "Bradicardia", desat: "Desaturación", grunt: "Quejido", vpp: "VPP", vpp_ct: "VPP + Masaje" } },
+            en: { loading: "Loading NeoMonitor...", connecting: "CONNECTING...", bed: "BED", mute: "Mute", menu: "Menu", link: "LINK", simNotStarted: "Simulation not started", id: "ID", sessionId: "SESSION ID", scanPrompt: "Scan to connect control...", scanManual: "Enter the ID shown next to the QR code", placeholderId: "Enter ID", scanCamera: "Scan Monitor", scanPhonePrompt: "Scan with your phone to use as a remote control", startMonitorBtn: "TAP TO START MONITOR", mainPrompt: "Open this app on both devices", useAsMonitor: "Use this device as Monitor", useAsControl: "Use this device as Control", howToConnect: "How to connect? (View guide)", guideTitle: "Connection Guide", step1: "Step 1", step2: "Step 2", guideStep1: "Choose MONITOR on your Tablet or PC", guideStep2: "Choose CONTROL on your Phone and scan the QR", guideBtn: "Understood, start!", control: "Control", debriefing: "Debriefing", endSim: "END SIMULATION", startSim: "START SIMULATION", transition: "Transition", hr: "HR", act: "Act", presets: { normal: "Normal", brady: "Bradycardia", desat: "Desaturation", grunt: "Grunt", vpp: "PPV", vpp_ct: "PPV + Massage" } },
+            pt: { loading: "Carregando NeoMonitor...", connecting: "CONECTANDO...", bed: "LEITO", mute: "Silenciar", menu: "Menu", link: "VINCULAR", simNotStarted: "Simulação não iniciada", id: "ID", sessionId: "ID DA SESSÃO", scanPrompt: "Escaneie para conectar o controle...", scanManual: "Insira o ID que aparece ao lado do código QR", placeholderId: "Insira o ID", scanCamera: "Escanear Monitor", scanPhonePrompt: "Escaneie com seu celular para usá-lo como controle remoto", startMonitorBtn: "TOCAR PARA INICIAR MONITOR", mainPrompt: "Abra este aplicativo nos dois dispositivos", useAsMonitor: "Usar este dispositivo como Monitor", useAsControl: "Usar este dispositivo como Controle", howToConnect: "Como conectar? (Ver guia)", guideTitle: "Guia de Conexão", step1: "Passo 1", step2: "Passo 2", guideStep1: "Escolha MONITOR no seu Tablet ou PC", guideStep2: "Escolha CONTROLE no seu celular e escaneie o QR", guideBtn: "Entendido, vamos começar!", control: "Controle", debriefing: "Debriefing", endSim: "FINALIZAR SIMULAÇÃO", startSim: "INICIAR SIMULAÇÃO", transition: "Transição", hr: "FC", act: "Atu", presets: { normal: "Normal", brady: "Bradicardia", desat: "Dessaturação", grunt: "Gemido", vpp: "VPP", vpp_ct: "VPP + Massagem" } }
         };
 
         const Icons = {
             Activity: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
             Monitor: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>,
             Smartphone: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg>,
-            Wifi: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>,
-            VolumeX: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>,
-            Play: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>,
-            Battery: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></svg>,
-            QrCode: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h7v7h-7z"/><path d="M7 17h.01"/><path d="M17 7h.01"/><path d="M17 17h.01"/></svg>,
             X: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>,
-            Clock: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-            List: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" x2="21" y1="6" y2="6"></line><line x1="8" x2="21" y1="12" y2="12"></line><line x1="8" x2="21" y1="18" y2="18"></line><line x1="3" x2="3.01" y1="6" y2="6"></line><line x1="3" x2="3.01" y1="12" y2="12"></line><line x1="3" x2="3.01" y1="18" y2="18"></line></svg>,
-            Camera: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>,
-            ArrowRight: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
-            Help: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-            Heart: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
+            QrCode: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h7v7h-7z"/><path d="M7 17h.01"/><path d="M17 7h.01"/><path d="M17 17h.01"/></svg>,
             Globe: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
-            ChevronDown: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            ChevronDown: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>,
+            Heart: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
+            Wifi: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>,
+            Battery: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></svg>,
+            VolumeX: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>,
+            Help: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+            ArrowRight: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+            Camera: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         };
 
-        const DEFAULT_VITALS = { hr: 122, spo2: 91, resp: 45, alarmMuted: false, connected: true, transition: null, soundTimestamp: 0, soundType: null, simRunning: false };
-
-        const SponsorSpace = ({ className = "", compact = false, source = "Monitor", t }) => (
-            <div className={`sponsor-container ${className}`} onClick={() => { trackNeoEvent('sponsor_click', source); window.open('https://tu-sitio-o-del-sponsor.com', '_blank'); }}>
-                <div className="flex flex-col items-center">
-                    <span className="text-[10px] text-slate-500 font-bold mb-0.5">SPONSOR</span>
-                    <div className="bg-slate-700/50 w-full px-4 py-1 rounded flex items-center justify-center"><span className="text-[9px] text-slate-400 font-mono italic">LOGO HERE</span></div>
-                </div>
-            </div>
-        );
-
-        let audioCtx;
-        const initAudio = () => {
-            if (!audioCtx) { const AudioContext = window.AudioContext || window.webkitAudioContext; audioCtx = new AudioContext(); }
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+        // --- 3. FUNCIONES DE APOYO Y SONIDO ---
+        let audioContext;
+        const playAlarmSequence = (type) => {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!audioContext) audioContext = new AudioContext();
+            const now = audioContext.currentTime;
+            const createTone = (f, s, d) => { 
+                const o = audioContext.createOscillator(); 
+                const g = audioContext.createGain(); 
+                o.connect(g); g.connect(audioContext.destination); 
+                o.type = 'square'; o.frequency.value = f; 
+                g.gain.setValueAtTime(0.08, s); g.gain.setValueAtTime(0, s+d); 
+                o.start(s); o.stop(s+d); 
+            };
+            if (type === 'critical') { createTone(880, now, 0.1); createTone(880, now + 0.2, 0.1); createTone(880, now + 0.4, 0.1); }
+            else if (type === 'warning') { createTone(600, now, 0.2); createTone(600, now + 0.4, 0.2); }
         };
 
         const playBeep = (pitch = 800) => {
-            if (!audioCtx || audioCtx.state !== 'running') return;
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
-            oscillator.type = 'sine'; oscillator.frequency.value = pitch;
-            const now = audioCtx.currentTime;
-            gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-            oscillator.start(now); oscillator.stop(now + 0.15);
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!audioContext) audioContext = new AudioContext();
+            const osc = audioContext.createOscillator(); 
+            const gn = audioContext.createGain();
+            osc.connect(gn); gn.connect(audioContext.destination);
+            osc.type = 'sine'; osc.frequency.value = pitch;
+            const now = audioContext.currentTime;
+            gn.gain.setValueAtTime(0.1, now); 
+            gn.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            osc.start(now); osc.stop(now + 0.15);
         };
 
-        const playAlarmSequence = (type) => {
-             if (!audioCtx || audioCtx.state !== 'running') return;
-             const now = audioCtx.currentTime;
-             const createTone = (freq, start, duration) => {
-                 const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-                 osc.connect(gain); gain.connect(audioCtx.destination);
-                 osc.type = 'square'; osc.frequency.value = freq;
-                 gain.gain.setValueAtTime(0.08, start); gain.gain.setValueAtTime(0, start + duration);
-                 osc.start(start); osc.stop(start + duration);
-             };
-             if (type === 'critical') { createTone(880, now, 0.1); createTone(880, now + 0.2, 0.1); createTone(880, now + 0.4, 0.1); }
-             else if (type === 'warning') { createTone(600, now, 0.2); createTone(600, now + 0.4, 0.2); }
-        };
+        // --- 4. HOOKS PERSONALIZADOS ---
+        function useInterpolatedVitals(target) {
+            const [vitals, setVitals] = useState(target);
+            useEffect(() => {
+                if (!target || !target.transition) { setVitals(target); return; }
+                let frame;
+                const animate = () => {
+                    const elapsed = Date.now() - target.transition.startTime;
+                    const p = Math.min(1, elapsed / target.transition.duration);
+                    if (p < 1) {
+                        setVitals({ 
+                            ...target, 
+                            hr: Math.round(target.transition.startHr + (target.transition.targetHr - target.transition.startHr) * p), 
+                            spo2: Math.round(target.transition.startSpo2 + (target.transition.targetSpo2 - target.transition.startSpo2) * p) 
+                        });
+                        frame = requestAnimationFrame(animate);
+                    } else setVitals(target);
+                };
+                frame = requestAnimationFrame(animate);
+                return () => cancelAnimationFrame(frame);
+            }, [target]);
+            return vitals;
+        }
+
+        // --- 5. COMPONENTES DE APOYO (Definidos antes de App) ---
 
         const WaveformCanvas = ({ color, speed, type, flatline, onBeat }) => {
             const canvasRef = useRef(null);
             const dataRef = useRef([]);
             const phaseRef = useRef(0);
             const lastTimeRef = useRef(performance.now());
-            const pulseVariability = useRef({ amplitude: 1, width: 1 });
+            const variability = useRef({ amplitude: 1, width: 1 });
 
             useEffect(() => {
                 const canvas = canvasRef.current;
@@ -273,8 +208,7 @@
                     lastTimeRef.current = time;
                     if (deltaTime > 0.1) { frameId = requestAnimationFrame(draw); return; }
                     if (canvas.width !== canvas.offsetWidth) {
-                        canvas.width = canvas.offsetWidth;
-                        canvas.height = canvas.offsetHeight;
+                        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
                         dataRef.current = new Array(canvas.width).fill(canvas.height / 2);
                     }
                     let newValue = canvas.height / 2;
@@ -286,42 +220,25 @@
                         phaseRef.current += (beatsPerSecond * 2 * Math.PI) * deltaTime;
                         if (phaseRef.current >= 2 * Math.PI) {
                             phaseRef.current -= 2 * Math.PI;
-                            pulseVariability.current = {
-                                amplitude: 0.85 + Math.random() * 0.3,
-                                width: 0.95 + Math.random() * 0.1
-                            };
+                            variability.current = { amplitude: 0.85 + Math.random() * 0.3, width: 0.95 + Math.random() * 0.1 };
+                            if (type === 'ecg' && onBeat) onBeat();
                         }
                         const p = phaseRef.current;
-                        const { amplitude, width } = pulseVariability.current;
-
-                        if (type === 'ecg' && onBeat) {
-                             const threshold = Math.PI;
-                             if (prevPhase < threshold && p >= threshold) onBeat();
-                        }
+                        const { amplitude, width } = variability.current;
 
                         if (type === 'ecg') {
                             const scaledPhase = (p - Math.PI) / width + Math.PI;
-                            if (scaledPhase > 3.0 && scaledPhase < 3.28) {
-                                newValue = (canvas.height / 2) - (baseAmplitude * 2.5 * amplitude * Math.exp(-Math.pow(scaledPhase - Math.PI, 2) * 50));
-                            } else if (scaledPhase > 3.5 && scaledPhase < 4.5) {
-                                newValue = (canvas.height / 2) - (baseAmplitude * 0.3 * amplitude * Math.sin(scaledPhase - 3.5));
-                            } else {
-                                newValue = (canvas.height / 2) + (Math.random() * 1.5 - 0.75);
-                            }
-                        } else {
-                            newValue = (canvas.height / 2) - (Math.sin(p) * baseAmplitude * 0.6 * amplitude);
-                        }
-                    } else { newValue = (canvas.height / 2) + (Math.random() * 2 - 1); }
+                            if (scaledPhase > 3.0 && scaledPhase < 3.28) newValue = (canvas.height / 2) - (baseAmplitude * 2.5 * amplitude * Math.exp(-Math.pow(scaledPhase - Math.PI, 2) * 50));
+                            else if (scaledPhase > 3.5 && scaledPhase < 4.5) newValue = (canvas.height / 2) - (baseAmplitude * 0.3 * amplitude * Math.sin(scaledPhase - 3.5));
+                            else newValue = (canvas.height / 2) + (Math.random() * 1.5 - 0.75);
+                        } else newValue = (canvas.height / 2) - (Math.sin(p) * baseAmplitude * 0.6 * amplitude);
+                    } else newValue = (canvas.height / 2) + (Math.random() * 2 - 1);
                     
-                    dataRef.current.push(newValue);
-                    dataRef.current.shift();
+                    dataRef.current.push(newValue); dataRef.current.shift();
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.lineWidth = 2.5; ctx.strokeStyle = color; ctx.beginPath();
-                    for (let i = 0; i < dataRef.current.length; i++) {
-                        if (i === 0) ctx.moveTo(i, dataRef.current[i]); else ctx.lineTo(i, dataRef.current[i]);
-                    }
-                    ctx.stroke();
-                    frameId = requestAnimationFrame(draw);
+                    for (let i = 0; i < dataRef.current.length; i++) { if (i === 0) ctx.moveTo(i, dataRef.current[i]); else ctx.lineTo(i, dataRef.current[i]); }
+                    ctx.stroke(); frameId = requestAnimationFrame(draw);
                 };
                 frameId = requestAnimationFrame(draw);
                 return () => cancelAnimationFrame(frameId);
@@ -330,273 +247,59 @@
             return <canvas ref={canvasRef} className="w-full h-full block" />;
         };
 
-        const useInterpolatedVitals = (target) => {
-            const [vitals, setVitals] = useState(target);
+        const LanguageSelector = ({ currentLang, onSelect }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const menuRef = useRef(null);
             useEffect(() => {
-                if (!target.transition) { setVitals(target); return; }
-                let frame;
-                const animate = () => {
-                    const elapsed = Date.now() - target.transition.startTime;
-                    const p = Math.min(1, elapsed / target.transition.duration);
-                    if (p < 1) {
-                        setVitals({
-                            ...target,
-                            hr: Math.round(target.transition.startHr + (target.transition.targetHr - target.transition.startHr) * p),
-                            spo2: Math.round(target.transition.startSpo2 + (target.transition.targetSpo2 - target.transition.startSpo2) * p),
-                        });
-                        frame = requestAnimationFrame(animate);
-                    } else { setVitals(target); }
-                };
-                frame = requestAnimationFrame(animate);
-                return () => cancelAnimationFrame(frame);
-            }, [target]);
-            return vitals;
-        };
-
-        const MonitorScreen = ({ sessionId, vitals: targetVitals, t }) => {
-            const vitals = useInterpolatedVitals(targetVitals);
-            const [audioEnabled, setAudioEnabled] = useState(false);
-            const [time, setTime] = useState(new Date());
-            const [alarmState, setAlarmState] = useState('none');
-            const [flash, setFlash] = useState(false);
-            const [qrExpanded, setQrExpanded] = useState(false);
-            const [hrDrift, setHrDrift] = useState(0);
-
-            useEffect(() => {
-                const t = setInterval(() => setTime(new Date()), 1000);
-                return () => clearInterval(t);
+                const handleClickOutside = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setIsOpen(false); };
+                document.addEventListener('mousedown', handleClickOutside); return () => document.removeEventListener('mousedown', handleClickOutside);
             }, []);
-
-            useEffect(() => {
-                if (!vitals.simRunning) { setHrDrift(0); return; }
-                const driftInterval = setInterval(() => {
-                    const possibleDrifts = [-2, -1, 0, 1, 2];
-                    setHrDrift(possibleDrifts[Math.floor(Math.random() * possibleDrifts.length)]);
-                }, 3000 + Math.random() * 2000);
-                return () => clearInterval(driftInterval);
-            }, [vitals.simRunning]);
-
-            useEffect(() => {
-                if (!vitals.simRunning) { setAlarmState('none'); return; }
-                let level = 'none';
-                if (vitals.hr < 60 || vitals.hr === 0 || vitals.spo2 < 80) level = 'critical';
-                else if (vitals.hr < 100 || vitals.hr > 180 || vitals.spo2 < 89) level = 'warning';
-                setAlarmState(level);
-                const interval = setInterval(() => setFlash(p => !p), level === 'critical' ? 300 : 800);
-                return () => clearInterval(interval);
-            }, [vitals.hr, vitals.spo2, vitals.simRunning]);
-
-            useEffect(() => {
-                let interval;
-                if (audioEnabled && !vitals.alarmMuted && alarmState !== 'none' && vitals.simRunning) {
-                    playAlarmSequence(alarmState);
-                    interval = setInterval(() => playAlarmSequence(alarmState), alarmState === 'critical' ? 2500 : 4000);
-                }
-                return () => clearInterval(interval);
-            }, [alarmState, audioEnabled, vitals.alarmMuted, vitals.simRunning]);
-
-            const handleBeat = () => {
-                if (!audioEnabled || vitals.alarmMuted || !vitals.simRunning) return;
-                playBeep(vitals.spo2 < 89 ? 400 : 800);
-            };
-
-            const start = () => { 
-                if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen().catch(() => {}); }
-                initAudio(); setAudioEnabled(true); 
-                trackNeoEvent('monitor_active', 'Audio enabled on monitor', { session_id: sessionId });
-            };
-
-            const displayHr = vitals.simRunning && vitals.hr > 0 ? (vitals.hr + hrDrift) : (vitals.simRunning ? vitals.hr : '--');
-
             return (
-                <div className={`w-full h-screen bg-black flex flex-col border-[12px] transition-colors duration-100 ${alarmState === 'none' || vitals.alarmMuted || !vitals.simRunning ? 'border-slate-900' : (alarmState === 'critical' ? (flash ? 'border-red-600 bg-red-900/10' : 'border-red-900') : (flash ? 'border-yellow-500 bg-yellow-900/10' : 'border-yellow-900'))} hardware-accelerated monitor-screen`}>
-                    {!audioEnabled && (
-                        <div className="absolute inset-0 bg-black/90 z-50 flex items-center justify-center text-center px-4">
-                            <button onClick={start} className="bg-green-600 px-8 py-4 rounded-xl font-bold text-xl animate-pulse">{t.startMonitorBtn}</button>
-                        </div>
-                    )}
-
-                    {audioEnabled && !vitals.simRunning && (
-                        <div className="absolute inset-0 bg-black z-40 flex flex-col items-center justify-center text-center p-6 border-4 border-slate-800 m-2 rounded-xl">
-                            <Icons.Monitor className="w-12 h-12 text-slate-700 mb-4" />
-                            <h2 className="text-xl font-bold text-slate-500 uppercase tracking-widest mb-4">{t.simNotStarted}</h2>
-                            <div className="bg-white p-3 rounded-lg shadow-lg mb-4">
-                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(window.location.origin + window.location.pathname + '?mode=control&session=' + sessionId)}`} alt="Sync" className="w-[180px] h-[180px]" />
-                            </div>
-                            <p className="text-xs text-slate-400 font-mono mb-2">{t.sessionId}: {sessionId}</p>
-                            <p className="text-slate-400 text-sm italic">{t.scanPrompt}</p>
-                        </div>
-                    )}
-
-                    {qrExpanded && (
-                        <div className="fixed inset-0 bg-black/90 z-[100] flex flex-col items-center justify-center p-6" onClick={() => setQrExpanded(false)}>
-                            <div className="bg-white p-4 rounded-2xl shadow-2xl max-w-xs w-full aspect-square flex items-center justify-center relative animate-zoom" onClick={e => e.stopPropagation()}>
-                                <button onClick={() => setQrExpanded(false)} className="absolute -top-12 right-0 text-white"><Icons.X className="w-8 h-8" /></button>
-                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(window.location.origin + window.location.pathname + '?mode=control&session=' + sessionId)}`} alt="QR" className="w-full h-full" />
-                            </div>
-                            <p className="mt-6 text-white font-bold text-center px-4">{t.scanPhonePrompt}</p>
-                        </div>
-                    )}
-
-                    <div className="flex-none flex justify-between px-4 py-2 bg-slate-900/50 text-slate-400 text-sm font-mono border-b border-slate-800 top-bar">
-                        <div className="flex gap-4"><span>NEONATAL</span><span>{t.bed}: 01</span></div>
-                        <div className="flex gap-4 items-center">{vitals.alarmMuted && <Icons.VolumeX className="text-orange-500 w-4 h-4" />}<span>{t.id}: {sessionId}</span></div>
-                    </div>
-
-                    <div className="flex-1 flex flex-col divide-y divide-slate-800 min-h-0">
-                        <div className="flex-[1.5] grid grid-cols-[1fr_280px] h-full main-row">
-                            <div className="relative border-r border-slate-800 bg-black waveform-col">{vitals.simRunning && <WaveformCanvas color="#42B334" speed={displayHr !== '--' ? displayHr : 0} type="ecg" flatline={vitals.hr === 0} onBeat={handleBeat}/>}</div>
-                            <div className="flex flex-col items-center px-4 justify-center number-container">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[#42B334] font-bold text-lg number-label">{t.hr}</span>
-                                    {vitals.simRunning && vitals.hr > 0 && <Icons.Heart className="heart-portrait text-red-600 fill-red-600 w-6 h-6" style={{ animation: `heartbeat ${60/displayHr}s infinite cubic-bezier(0.4, 0, 0.2, 1)` }}/>}
-                                </div>
-                                <span className={`font-mono font-bold leading-none number-display ${alarmState !== 'none' && !vitals.alarmMuted && flash ? 'text-white' : 'text-[#42B334]'}`} style={{fontSize: '18vh'}}>{displayHr}</span>
-                            </div>
-                        </div>
-                        <div className="flex-[1.5] grid grid-cols-[1fr_280px] h-full main-row">
-                            <div className="relative border-r border-slate-800 bg-black waveform-col">{vitals.simRunning && <WaveformCanvas color="#facc15" speed={displayHr !== '--' ? displayHr : 0} type="pleth" flatline={vitals.spo2 === 0}/>}</div>
-                            <div className="flex flex-col items-center px-4 justify-center number-container">
-                                <span className="text-yellow-400 font-bold text-lg number-label">SpO2</span>
-                                <span className={`font-mono font-bold leading-none number-display ${alarmState !== 'none' && !vitals.alarmMuted && flash ? 'text-white' : 'text-yellow-400'}`} style={{fontSize: '18vh'}}>{vitals.simRunning ? (vitals.spo2 || '--') : '--'}</span>
-                            </div>
-                        </div>
-                        <div className="flex-1 grid grid-cols-[1fr_1fr_280px] h-full divide-x divide-slate-800 extra-info-row">
-                            <div className="flex flex-col justify-center items-center text-slate-600"><span className="text-xs">RESP</span><span className="text-4xl font-bold">---</span></div>
-                            <div className="flex flex-col justify-center items-center text-slate-600"><span className="text-xs">NIBP</span><span className="text-2xl font-bold">--/--</span></div>
-                            <div className="p-2 flex items-center justify-center sponsor-col"><SponsorSpace className="w-full h-full" source="Monitor" t={t} /></div>
-                        </div>
-                    </div>
-
-                    <div className="flex-none bg-slate-900 p-2 flex justify-between items-center text-xs text-slate-500 bottom-bar">
-                        <div className="flex gap-2">
-                            <div className="soft-key px-4 py-2">{t.mute}</div>
-                            <div className="soft-key px-4 py-2">{t.menu}</div>
-                            <div className="soft-key qr-button px-3 py-2 flex items-center gap-1 font-bold" onClick={() => setQrExpanded(true)}><Icons.QrCode className="w-4 h-4" /><span>{t.link}</span></div>
-                        </div>
-                        <div className="flex-1 flex justify-center opacity-30 font-mono text-[10px] tracking-widest border border-slate-800 mx-4 rounded py-1 bg-black/20">SPONSOR AREA</div>
-                        <div className="flex gap-4 items-center font-mono"><span>{time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span><Icons.Wifi className="w-4 h-4 text-green-500" /><Icons.Battery className="w-4 h-4 text-green-500" /></div>
-                    </div>
+                <div className="absolute top-6 left-6 z-[80]" ref={menuRef}>
+                    <button onClick={() => setIsOpen(!isOpen)} className="bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-slate-800 transition-all shadow-lg min-w-[80px] justify-between text-xs font-bold uppercase"><Icons.Globe className="w-3 h-3"/>{currentLang}</button>
+                    {isOpen && (<div className="absolute top-full left-0 mt-2 bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-2xl animate-zoom origin-top-left min-w-[120px]">{['es', 'en', 'pt'].map(l => (<button key={l} onClick={() => { onSelect(l); setIsOpen(false); }} className={`w-full text-left px-4 py-3 text-xs font-medium border-b border-slate-800 last:border-0 hover:bg-slate-800 transition-colors uppercase ${currentLang === l ? 'bg-slate-800 text-blue-400' : 'text-slate-400'}`}>{l}</button>))}</div>)}
                 </div>
             );
         };
 
-        const ControllerScreen = ({ sessionId, vitals: currentVitals, onUpdate, t }) => {
-            const [transitionDuration, setTransitionDuration] = useState(5);
-            const [showDebrief, setShowDebrief] = useState(false);
-            const [eventLog, setEventLog] = useState([]);
-            const [localTargets, setLocalTargets] = useState({ hr: currentVitals.hr, spo2: currentVitals.spo2 });
-            const [simStartTime, setSimStartTime] = useState(null);
-            const [displayTime, setDisplayTime] = useState("00:00");
-
-            useEffect(() => { setLocalTargets({ hr: currentVitals.hr, spo2: currentVitals.spo2 }); }, [currentVitals.hr, currentVitals.spo2]);
-
+        const ProfileSelector = ({ currentProfile, onSelect, lang }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const menuRef = useRef(null);
             useEffect(() => {
-                let interval;
-                if (currentVitals.simRunning) {
-                    if (!simStartTime) setSimStartTime(Date.now());
-                    interval = setInterval(() => {
-                        const start = simStartTime || Date.now();
-                        const elapsed = Math.floor((Date.now() - start) / 1000);
-                        setDisplayTime(`${Math.floor(elapsed / 60).toString().padStart(2, '0')}:${(elapsed % 60).toString().padStart(2, '0')}`);
-                    }, 1000);
-                } else { setSimStartTime(null); setDisplayTime("00:00"); }
-                return () => clearInterval(interval);
-            }, [currentVitals.simRunning, simStartTime]);
-
-            const logAction = (message, force = false) => { 
-                if (!currentVitals.simRunning && !force) return;
-                const baseTime = (force && !currentVitals.simRunning) ? Date.now() : simStartTime;
-                const elapsedTotalSeconds = baseTime ? Math.floor((Date.now() - baseTime) / 1000) : 0;
-                const timestamp = `${Math.floor(elapsedTotalSeconds / 60).toString().padStart(2, '0')}:${(elapsedTotalSeconds % 60).toString().padStart(2, '0')}`;
-                setEventLog(prev => [...prev, {time: timestamp, msg: message}]);
-            };
-
-            const toggleSimulation = () => {
-                const isNowRunning = !currentVitals.simRunning;
-                if (isNowRunning) { logAction("Simulation Started", true); onUpdate({ ...currentVitals, simRunning: true, transition: null }); trackNeoEvent('sim_start', 'Manual simulation start', { session_id: sessionId }); }
-                else { logAction("Simulation Stopped", true); onUpdate({ ...currentVitals, simRunning: false }); trackNeoEvent('sim_stop', 'Manual simulation stop', { session_id: sessionId }); }
-            };
-
-            const handleCommitChange = (field, value) => {
-                const now = Date.now();
-                logAction(`Changed ${field.toUpperCase()}: ${value}`);
-                trackNeoEvent('vital_change', `Manual ${field} update`, { field, value, transition: transitionDuration });
-                onUpdate({ ...currentVitals, [field]: value, transition: (transitionDuration > 0 && currentVitals.simRunning) ? { startTime: now, duration: transitionDuration * 1000, startHr: currentVitals.hr, targetHr: field === 'hr' ? value : currentVitals.hr, startSpo2: currentVitals.spo2, targetSpo2: field === 'spo2' ? value : currentVitals.spo2 } : null });
-            };
-
-            const applyPreset = (type, name) => {
-                let p = {};
-                switch(type) {
-                    case 'normal': p = { hr: 142, spo2: 94 }; break;
-                    case 'brady': p = { hr: 68, spo2: 75 }; break;
-                    case 'desat': p = { hr: 110, spo2: 84 }; break;
-                    case 'vpp': p = { hr: 88, spo2: 84 }; break;
-                    case 'vpp_ct': p = { hr: 56, spo2: 65 }; break;
-                }
-                const now = Date.now();
-                onUpdate({ ...currentVitals, ...p, transition: currentVitals.simRunning ? { startTime: now, duration: transitionDuration * 1000, startHr: currentVitals.hr, targetHr: p.hr, startSpo2: currentVitals.spo2, targetSpo2: p.spo2 } : null });
-                logAction(`Scenario: ${name}`);
-                trackNeoEvent('scenario_preset', `Preset: ${name}`, { preset_type: type });
-            };
-
+                const handleClickOutside = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setIsOpen(false); };
+                document.addEventListener('mousedown', handleClickOutside); return () => document.removeEventListener('mousedown', handleClickOutside);
+            }, []);
             return (
-                <div className="h-screen overflow-y-auto bg-slate-900 text-white flex flex-col">
-                    <header className="flex-none flex justify-between items-center p-4 bg-slate-800">
-                        <div className="flex items-center gap-2">
-                            <h2 className="font-bold text-blue-400 flex items-center gap-2"><Icons.Smartphone className="w-4 h-4"/> {t.control}</h2>
-                            {currentVitals.simRunning && <span className="ml-2 px-2 py-0.5 bg-red-900/50 text-red-400 text-xs rounded border border-red-500 font-mono animate-pulse">{displayTime}</span>}
-                            <button onClick={() => setShowDebrief(true)} className="ml-4 bg-slate-700 text-xs px-2 py-1 rounded flex items-center gap-1"><Icons.List className="w-3 h-3"/> {t.debriefing}</button>
-                        </div>
-                        <span className="text-sm font-mono border border-slate-600 px-2 py-0.5 rounded">ID: {sessionId}</span>
-                    </header>
-
-                    {showDebrief && (
-                        <div className="fixed inset-0 bg-black/90 z-50 p-4 flex flex-col" onClick={() => setShowDebrief(false)}>
-                            <div className="bg-slate-800 rounded-xl flex-1 flex flex-col overflow-hidden max-w-md mx-auto w-full" onClick={e => e.stopPropagation()}>
-                                <div className="p-4 border-b border-slate-700 flex justify-between items-center"><h3 className="font-bold">{t.debriefing} (Min:Sec)</h3><button onClick={() => setShowDebrief(false)}><Icons.X className="w-6 h-6"/></button></div>
-                                <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-black/20">
-                                    {eventLog.length === 0 ? <p className="text-slate-500 italic text-center mt-10">No events recorded</p> : eventLog.map((l, i) => (
-                                        <div key={i} className="flex gap-3 text-sm border-b border-slate-700/30 pb-2"><span className="text-slate-400 font-mono w-14 flex-none">[{l.time}]</span><span>{l.msg}</span></div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="flex-1 p-4 space-y-6">
-                        <button onClick={toggleSimulation} className={`w-full p-6 rounded-xl font-bold text-xl flex items-center justify-center gap-4 shadow-lg border-2 transition-all active:scale-95 ${currentVitals.simRunning ? "bg-red-600 border-red-400" : "bg-blue-600 border-blue-400"}`}>
-                            {currentVitals.simRunning ? <Icons.X className="w-8 h-8"/> : <Icons.Play className="w-8 h-8 fill-white"/>}
-                            {currentVitals.simRunning ? t.endSim : t.startSim}
-                        </button>
-                        <div className="bg-slate-800 p-4 rounded-xl">
-                            <div className="flex justify-between mb-2 text-amber-400 font-bold"><label className="flex gap-2 text-sm"><Icons.Clock className="w-4 h-4"/> {t.transition}</label><span>{transitionDuration}s</span></div>
-                            <input type="range" min="0" max="60" step="5" value={transitionDuration} onChange={e => setTransitionDuration(parseInt(e.target.value))} className="w-full h-8 time-slider"/>
-                        </div>
-                        <div className="bg-slate-800 p-6 rounded-xl">
-                            <div className="flex justify-between mb-2 font-bold text-[#42B334]"><span>{t.hr}: {localTargets.hr}</span><span className="text-xs opacity-50">{t.act}: {currentVitals.hr}</span></div>
-                            <input type="range" min="0" max="220" value={localTargets.hr} onChange={e => setLocalTargets({ ...localTargets, hr: parseInt(e.target.value) })} onTouchEnd={() => handleCommitChange('hr', localTargets.hr)} onMouseUp={() => handleCommitChange('hr', localTargets.hr)} className="w-full h-12"/>
-                        </div>
-                        <div className="bg-slate-800 p-6 rounded-xl">
-                            <div className="flex justify-between mb-2 font-bold text-yellow-400"><span>SpO2: {localTargets.spo2}%</span><span className="text-xs opacity-50">{t.act}: {currentVitals.spo2}%</span></div>
-                            <input type="range" min="0" max="100" value={localTargets.spo2} onChange={e => setLocalTargets({ ...localTargets, spo2: parseInt(e.target.value) })} onTouchEnd={() => handleCommitChange('spo2', localTargets.spo2)} onMouseUp={() => handleCommitChange('spo2', localTargets.spo2)} className="w-full h-12 accent-yellow-400"/>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <button onClick={() => applyPreset('normal', t.presets.normal)} className="p-4 bg-emerald-900/40 border border-emerald-500/50 rounded-lg text-emerald-400 font-bold">{t.presets.normal}</button>
-                            <button onClick={() => applyPreset('brady', t.presets.brady)} className="p-4 bg-yellow-900/40 border border-yellow-500/50 rounded-lg text-yellow-400 font-bold">{t.presets.brady}</button>
-                            <button onClick={() => applyPreset('desat', t.presets.desat)} className="p-4 bg-blue-900/40 border border-blue-500/50 rounded-lg text-blue-400 font-bold text-sm">{t.presets.desat}</button>
-                            <button onClick={() => onUpdate({ ...currentVitals, soundType: 'grunt', soundTimestamp: Date.now() })} className="p-4 bg-orange-900/40 border border-orange-500/50 rounded-lg text-orange-400 font-bold">{t.presets.grunt}</button>
-                            <button onClick={() => applyPreset('vpp', t.presets.vpp)} className="p-4 bg-indigo-900/40 border border-indigo-500/50 rounded-lg text-indigo-400 font-bold">{t.presets.vpp}</button>
-                            <button onClick={() => applyPreset('vpp_ct', t.presets.vpp_ct)} className="p-4 bg-red-900/40 border border-red-500/50 rounded-lg text-red-500 font-bold">{t.presets.vpp_ct}</button>
-                        </div>
-                    </div>
-                    <div className="flex-none bg-slate-900 p-2 flex flex-col items-center">
-                        <div className="w-full opacity-30 font-mono text-[10px] tracking-widest border border-slate-700 rounded py-1 bg-black/20 text-center mb-1">SPONSOR AREA</div>
-                        <SponsorSpace compact className="h-10 w-full" source="Control" t={t} />
-                    </div>
+                <div className="absolute top-6 right-6 z-[80]" ref={menuRef}>
+                    <button onClick={() => setIsOpen(!isOpen)} className="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-slate-800 transition-all shadow-lg text-xs font-bold"><span className="text-green-400 uppercase tracking-widest">{PATIENT_PROFILES[currentProfile].label[lang]}</span><Icons.ChevronDown className="w-3 h-3 text-slate-500"/></button>
+                    {isOpen && (<div className="absolute top-full right-0 mt-2 bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-2xl animate-zoom origin-top-right min-w-[140px]">{Object.keys(PATIENT_PROFILES).map(p => (<button key={p} onClick={() => { onSelect(p); setIsOpen(false); }} className={`w-full text-right px-4 py-3 text-xs font-medium border-b border-slate-800 last:border-0 hover:bg-slate-800 transition-colors ${currentProfile === p ? 'bg-slate-800 text-green-400' : 'text-slate-400'}`}>{PATIENT_PROFILES[p].label[lang]}</button>))}</div>)}
                 </div>
             );
         };
+
+        const AnimatedGuide = ({ onClose, t }) => (
+            <div className="fixed inset-0 bg-slate-950/95 z-[90] flex flex-col p-6 animate-zoom overflow-y-auto">
+                <div className="flex justify-between items-center mb-8"><h2 className="text-2xl font-black text-white">{t.guideTitle}</h2><button onClick={onClose} className="p-2 bg-slate-800 rounded-full"><Icons.X /></button></div>
+                <div className="flex-1 flex flex-col items-center justify-center space-y-12 max-w-lg mx-auto w-full">
+                    <div className="relative w-full flex flex-col items-center">
+                        <div className="w-48 h-32 bg-slate-800 border-4 border-slate-700 rounded-lg flex items-center justify-center relative float-anim shadow-2xl">
+                            <Icons.Monitor className="w-10 h-10 text-green-500/50" />
+                            <div className="absolute inset-4 bg-white/10 rounded flex items-center justify-center"><Icons.QrCode className="w-8 h-8 text-white opacity-80" /></div>
+                        </div>
+                        <p className="mt-4 text-center text-sm"><span className="text-green-400 font-bold uppercase block text-xs mb-1">{t.step1}</span>{t.guideStep1}</p>
+                    </div>
+                    <div className="relative w-full flex flex-col items-center">
+                        <div className="w-20 h-40 bg-slate-800 border-4 border-slate-700 rounded-2xl flex items-center justify-center relative float-anim shadow-2xl" style={{animationDelay:'1.5s'}}>
+                            <div className="absolute inset-2 bg-black rounded-lg overflow-hidden flex flex-col items-center justify-center">
+                                <div className="w-full h-1/2 bg-blue-500/10 flex items-center justify-center relative overflow-hidden"><div className="scan-line"></div><Icons.Camera className="w-6 h-6 text-blue-400 opacity-50" /></div>
+                            </div>
+                        </div>
+                        <p className="mt-4 text-center text-sm"><span className="text-blue-400 font-bold uppercase block text-xs mb-1">{t.step2}</span>{t.guideStep2}</p>
+                    </div>
+                </div>
+                <button onClick={onClose} className="mt-8 bg-white text-black font-black py-4 rounded-2xl uppercase tracking-widest text-sm shadow-xl hover:bg-slate-200 transition-colors">{t.guideBtn}</button>
+            </div>
+        );
 
         const QRScannerView = ({ onScan, onCancel, t }) => {
             const [sid, setSid] = useState('');
@@ -611,56 +314,146 @@
                 return () => { if (html5QrCode.isScanning) { html5QrCode.stop().catch(() => {}); } };
             }, []);
             return (
-                <div className="fixed inset-0 bg-slate-900 z-[60] flex flex-col p-6 animate-zoom">
-                    <div className="flex justify-between items-center mb-6"><h2 className="font-bold text-xl flex items-center gap-2"><Icons.Camera className="text-blue-400"/> {t.scanCamera}</h2><button onClick={onCancel} className="bg-slate-800 p-2 rounded-full"><Icons.X/></button></div>
-                    <div className="bg-black rounded-2xl overflow-hidden shadow-2xl mb-8 relative"><div id="reader"></div></div>
-                    <div className="mt-auto text-center space-y-4">
-                        <p className="text-slate-500 text-sm mb-4">{t.scanManual}</p>
-                        <div className="flex gap-2">
-                            <input type="number" placeholder={t.placeholderId} value={sid} onChange={e => setSid(e.target.value)} className="flex-1 bg-slate-800 border border-slate-700 p-4 rounded-xl text-center font-mono text-xl outline-none focus:border-blue-500"/>
-                            <button onClick={() => sid && onScan(sid)} className="bg-blue-600 p-4 rounded-xl px-6 font-bold"><Icons.ArrowRight/></button>
+                <div className="fixed inset-0 bg-slate-950 z-[100] flex flex-col p-6 animate-zoom">
+                    <div className="flex justify-between mb-8"><h2 className="text-xl font-bold uppercase tracking-widest">{t.scanCamera}</h2><button onClick={onCancel} className="p-2 bg-slate-800 rounded-full"><Icons.X/></button></div>
+                    <div className="bg-black rounded-3xl overflow-hidden mb-8 border-2 border-slate-800"><div id="reader"></div></div>
+                    <div className="mt-auto space-y-4">
+                        <p className="text-slate-500 text-xs text-center uppercase tracking-widest font-bold">{t.scanManual}</p>
+                        <div className="flex gap-2 max-w-sm mx-auto">
+                            <input id="manual-id" type="number" className="flex-1 bg-slate-800 p-4 rounded-xl text-center text-2xl font-mono" placeholder="0000" onChange={e => setSid(e.target.value)} value={sid}/>
+                            <button onClick={() => sid && onScan(sid)} className="bg-blue-600 px-8 rounded-xl shadow-lg"><Icons.ArrowRight/></button>
                         </div>
                     </div>
                 </div>
             );
         };
 
-        const AnimatedGuide = ({ onClose, t }) => (
-            <div className="fixed inset-0 bg-slate-950/95 z-[70] flex flex-col p-6 animate-zoom overflow-y-auto">
-                <div className="flex justify-between items-center mb-8"><h2 className="text-2xl font-black text-white">{t.guideTitle}</h2><button onClick={onClose} className="p-2 bg-slate-800 rounded-full"><Icons.X /></button></div>
-                <div className="flex-1 flex flex-col items-center justify-center space-y-12 max-w-lg mx-auto w-full">
-                    <div className="relative w-full flex flex-col items-center">
-                        <div className="w-48 h-32 bg-slate-800 border-4 border-slate-700 rounded-lg flex items-center justify-center relative float-anim shadow-2xl"><Icons.Monitor className="w-10 h-10 text-green-500/50" /><div className="absolute inset-4 bg-white/10 rounded flex items-center justify-center"><Icons.QrCode className="w-8 h-8 text-white opacity-80" /></div><div className="absolute -top-4 -right-4 bg-green-600 text-[10px] font-bold px-2 py-1 rounded-full text-white shadow-lg">DEVICE A</div></div>
-                        <p className="mt-4 text-center text-sm"><span className="text-green-400 font-bold uppercase block text-xs mb-1">{t.step1}</span>{t.guideStep1}</p>
-                    </div>
-                    <div className="flex flex-col items-center text-slate-700"><Icons.ArrowRight className="w-8 h-8 rotate-90" /></div>
-                    <div className="relative w-full flex flex-col items-center pb-8">
-                        <div className="w-20 h-40 bg-slate-800 border-4 border-slate-700 rounded-2xl flex items-center justify-center relative float-anim shadow-2xl" style={{animationDelay: '1.5s'}}><div className="absolute inset-2 bg-black rounded-lg overflow-hidden flex flex-col items-center justify-center"><div className="w-full h-1/2 bg-blue-500/10 flex items-center justify-center relative overflow-hidden"><div className="scan-line"></div><Icons.Camera className="w-6 h-6 text-blue-400 opacity-50" /></div><div className="p-1 space-y-1 w-full"><div className="w-full h-1 bg-slate-700 rounded"></div><div className="w-3/4 h-1 bg-slate-700 rounded"></div></div></div><div className="absolute -top-4 -right-4 bg-blue-600 text-[10px] font-bold px-2 py-1 rounded-full text-white shadow-lg">DEVICE B</div></div>
-                        <p className="mt-4 text-center text-sm"><span className="text-blue-400 font-bold uppercase block text-xs mb-1">{t.step2}</span>{t.guideStep2}</p>
-                    </div>
-                </div>
-                <button onClick={onClose} className="mt-8 bg-white text-black font-black py-4 rounded-2xl uppercase tracking-widest text-sm shadow-xl hover:bg-slate-200 transition-colors">{t.guideBtn}</button>
-            </div>
-        );
+        const MonitorScreen = ({ sessionId, vitals: targetVitals, t }) => {
+            const vitals = useInterpolatedVitals(targetVitals);
+            const profile = PATIENT_PROFILES[vitals?.patientType || 'neonatal'];
+            const [audioEnabled, setAudioEnabled] = useState(false);
+            const [time, setTime] = useState(new Date());
+            const [alarmState, setAlarmState] = useState('none');
+            const [flash, setFlash] = useState(false);
+            const [qrExpanded, setQrExpanded] = useState(false);
+            const [hrDrift, setHrDrift] = useState(0);
 
-        const LanguageSelector = ({ currentLang, onSelect }) => {
-            const [isOpen, setIsOpen] = useState(false); const menuRef = useRef(null);
+            useEffect(() => { const i = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(i); }, []);
+            useEffect(() => { if (!vitals?.simRunning) { setHrDrift(0); return; } const d = setInterval(() => { setHrDrift([-2, -1, 0, 1, 2][Math.floor(Math.random() * 5)]); }, 4000); return () => clearInterval(d); }, [vitals?.simRunning]);
+
             useEffect(() => {
-                const handleClickOutside = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setIsOpen(false); };
-                document.addEventListener('mousedown', handleClickOutside); return () => document.removeEventListener('mousedown', handleClickOutside);
-            }, []);
-            const langs = [{ id: 'es', label: 'Español' }, { id: 'en', label: 'English' }, { id: 'pt', label: 'Português' }];
+                if (!vitals?.simRunning) { setAlarmState('none'); return; }
+                let level = 'none';
+                if (vitals.hr < profile.crit || vitals.hr === 0 || vitals.spo2 < 80) level = 'critical';
+                else if (vitals.hr < profile.brady || vitals.hr > profile.tachy || vitals.spo2 < 89) level = 'warning';
+                setAlarmState(level);
+                const i = setInterval(() => setFlash(p => !p), level === 'critical' ? 300 : 800);
+                return () => clearInterval(i);
+            }, [vitals?.hr, vitals?.spo2, vitals?.simRunning, profile]);
+
+            useEffect(() => {
+                let i; if (audioEnabled && !vitals?.alarmMuted && alarmState !== 'none' && vitals?.simRunning) {
+                    playAlarmSequence(alarmState); i = setInterval(() => playAlarmSequence(alarmState), alarmState === 'critical' ? 2500 : 4000);
+                } return () => clearInterval(i);
+            }, [alarmState, audioEnabled, vitals?.alarmMuted, vitals?.simRunning]);
+
+            const displayHr = vitals?.simRunning && vitals.hr > 0 ? (vitals.hr + hrDrift) : (vitals?.simRunning ? vitals.hr : '--');
+
             return (
-                <div className="absolute top-6 right-6 z-[80]" ref={menuRef}>
-                    <button onClick={() => setIsOpen(!isOpen)} className="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-slate-800 transition-all shadow-lg min-w-[80px] justify-between"><span className="text-xs font-bold text-white uppercase">{currentLang}</span><Icons.ChevronDown className={`w-3 h-3 text-slate-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></button>
-                    {isOpen && (<div className="absolute top-full right-0 mt-2 bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-2xl animate-zoom origin-top-right min-w-[120px]">{langs.map(l => (<button key={l.id} onClick={() => { onSelect(l.id); setIsOpen(false); }} className={`w-full text-left px-4 py-3 text-xs font-medium border-b border-slate-800 last:border-0 hover:bg-slate-800 transition-colors ${currentLang === l.id ? 'bg-slate-800 text-blue-400' : 'text-slate-400'}`}>{l.label}</button>))}</div>)}
+                <div className={`w-full h-screen bg-black flex flex-col border-[12px] transition-colors duration-100 ${alarmState === 'none' || vitals?.alarmMuted || !vitals?.simRunning ? 'border-slate-900' : (alarmState === 'critical' ? (flash ? 'border-red-600 bg-red-900/10' : 'border-red-900') : (flash ? 'border-yellow-500 bg-yellow-900/10' : 'border-yellow-900'))} monitor-screen`}>
+                    {!audioEnabled && (
+                        <div className="absolute inset-0 bg-black/90 z-50 flex items-center justify-center p-6 text-center"><button onClick={() => setAudioEnabled(true)} className="bg-green-600 px-10 py-5 rounded-2xl font-black text-xl animate-pulse uppercase tracking-widest">{t.startMonitorBtn}</button></div>
+                    )}
+                    {qrExpanded && (
+                        <div className="fixed inset-0 bg-black/95 z-[100] flex flex-col items-center justify-center p-6" onClick={() => setQrExpanded(false)}>
+                            <div className="bg-white p-4 rounded-3xl relative animate-zoom max-w-xs w-full" onClick={e => e.stopPropagation()}>
+                                <button onClick={() => setQrExpanded(false)} className="absolute -top-12 right-0 text-white"><Icons.X className="w-8 h-8"/></button>
+                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(window.location.origin + window.location.pathname + '?mode=control&session=' + sessionId)}`} className="w-full h-full"/>
+                            </div>
+                            <p className="mt-8 text-white font-bold text-center">{t.scanPhonePrompt}</p>
+                        </div>
+                    )}
+                    <div className="flex-none flex justify-between px-4 py-2 bg-slate-900/50 text-slate-400 text-sm font-mono border-b border-slate-800">
+                        <div className="flex gap-4"><span>{profile.tag}</span><span>{t.bed}: 01</span></div>
+                        <div className="flex gap-4 items-center">{vitals?.alarmMuted && <Icons.VolumeX className="text-orange-500 w-4 h-4" />}<span>ID: {sessionId}</span></div>
+                    </div>
+                    <div className="flex-1 flex flex-col divide-y divide-slate-800 min-h-0">
+                        <div className="flex-[1.5] grid grid-cols-[1fr_280px] main-row">
+                            <div className="relative border-r border-slate-800 bg-black waveform-col">
+                                {vitals?.simRunning && <WaveformCanvas color="#42B334" speed={displayHr !== '--' ? displayHr : 0} type="ecg" flatline={vitals.hr === 0} onBeat={() => { if (audioEnabled && !vitals.alarmMuted) playBeep(vitals.spo2 < 89 ? 400 : 800); }}/>}
+                            </div>
+                            <div className="flex flex-col items-center justify-center">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[#42B334] font-bold text-lg uppercase">{t.hr}</span>
+                                    {vitals?.simRunning && vitals.hr > 0 && <Icons.Heart className="heart-portrait text-red-600 fill-red-600 w-6 h-6" style={{ animation: `heartbeat ${60/displayHr}s infinite cubic-bezier(0.4, 0, 0.2, 1)` }}/>}
+                                </div>
+                                <span className={`font-mono font-bold leading-none ${alarmState !== 'none' && !vitals?.alarmMuted && flash ? 'text-white' : 'text-[#42B334]'}`} style={{fontSize: '18vh'}}>{displayHr}</span>
+                            </div>
+                        </div>
+                        <div className="flex-[1.5] grid grid-cols-[1fr_280px] main-row">
+                            <div className="relative border-r border-slate-800 bg-black waveform-col">
+                                {vitals?.simRunning && <WaveformCanvas color="#facc15" speed={displayHr !== '--' ? displayHr : 0} type="pleth" flatline={vitals.spo2 === 0}/>}
+                            </div>
+                            <div className="flex flex-col items-center justify-center">
+                                <span className="text-yellow-400 font-bold text-lg uppercase">SpO2</span>
+                                <span className={`font-mono font-bold leading-none ${alarmState !== 'none' && !vitals?.alarmMuted && flash ? 'text-white' : 'text-yellow-400'}`} style={{fontSize: '18vh'}}>{vitals?.simRunning ? (vitals.spo2 || '--') : '--'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex-none bg-slate-900 p-2 flex justify-between items-center text-xs text-slate-500">
+                        <div className="flex gap-2">
+                            <div className="soft-key px-4 py-2 uppercase font-bold">{t.mute}</div>
+                            <div className="soft-key qr-button px-4 py-2 flex items-center gap-1 font-bold" onClick={() => setQrExpanded(true)}><Icons.QrCode className="w-4 h-4" /><span>{t.link}</span></div>
+                        </div>
+                        <div className="flex gap-4 items-center font-mono text-slate-500"><span>{time.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span><Icons.Wifi className="w-5 h-5 text-green-500"/><Icons.Battery className="w-5 h-5 text-green-500"/></div>
+                    </div>
                 </div>
             );
         };
 
+        const ControllerScreen = ({ sessionId, vitals: currentVitals, onUpdate, t }) => {
+            const profile = PATIENT_PROFILES[currentVitals?.patientType || 'neonatal'];
+            const [transition, setTransition] = useState(5);
+            const [localTargets, setLocalTargets] = useState({ hr: currentVitals?.hr || 120, spo2: currentVitals?.spo2 || 95 });
+            useEffect(() => { if (currentVitals) setLocalTargets({ hr: currentVitals.hr, spo2: currentVitals.spo2 }); }, [currentVitals?.hr, currentVitals?.spo2]);
+
+            const applyPreset = (type) => {
+                let p = { hr: profile.normalHr, spo2: 95 };
+                if (type === 'brady') p = { hr: profile.brady - 20, spo2: 75 };
+                if (type === 'desat') p = { hr: profile.normalHr - 30, spo2: 84 };
+                if (type === 'vpp_ct') p = { hr: profile.crit - 20, spo2: 60 };
+                onUpdate({ ...currentVitals, ...p, transition: currentVitals.simRunning ? { startTime: Date.now(), duration: transition*1000, startHr: currentVitals.hr, targetHr: p.hr, startSpo2: currentVitals.spo2, targetSpo2: p.spo2 } : null });
+            };
+
+            const commit = (f, v) => onUpdate({ ...currentVitals, [f]: v, transition: (currentVitals.simRunning && transition > 0) ? { startTime: Date.now(), duration: transition*1000, startHr: currentVitals.hr, targetHr: f==='hr'?v:currentVitals.hr, startSpo2: currentVitals.spo2, targetSpo2: f==='spo2'?v:currentVitals.spo2 } : null });
+
+            return (
+                <div className="h-screen overflow-y-auto bg-slate-900 text-white flex flex-col p-4 space-y-6">
+                    <header className="flex justify-between items-center"><h2 className="font-bold text-blue-400 uppercase tracking-widest">{profile.label.es} Mode</h2></header>
+                    <button onClick={() => onUpdate({ ...currentVitals, simRunning: !currentVitals.simRunning })} className={`w-full p-6 rounded-2xl font-black text-xl shadow-2xl border-2 transition-all active:scale-95 ${currentVitals.simRunning ? "bg-red-600 border-red-400 shadow-red-900/20" : "bg-blue-600 border-blue-400 shadow-blue-900/20"}`}>{currentVitals.simRunning ? t.endSim : t.startSim}</button>
+                    <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                        <div className="flex justify-between mb-2 text-amber-500 text-[10px] font-black uppercase tracking-widest"><span>{t.transition}</span><span>{transition}s</span></div>
+                        <input type="range" min="0" max="60" step="5" value={transition} onChange={e => setTransition(parseInt(e.target.value))} className="w-full h-8 time-slider"/>
+                    </div>
+                    <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                        <div className="flex justify-between mb-2 font-bold text-[#42B334]"><span>FC: {localTargets.hr}</span><span className="text-[10px] opacity-40">{t.act}: {currentVitals.hr}</span></div>
+                        <input type="range" min="0" max={profile.maxHr} value={localTargets.hr} onChange={e => setLocalTargets({...localTargets, hr: parseInt(e.target.value)})} onTouchEnd={() => commit('hr', localTargets.hr)} className="w-full h-12"/>
+                    </div>
+                    <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                        <div className="flex justify-between mb-2 font-bold text-yellow-400"><span>SpO2: {localTargets.spo2}%</span><span className="text-[10px] opacity-40">{t.act}: {currentVitals.spo2}%</span></div>
+                        <input type="range" min="0" max="100" value={localTargets.spo2} onChange={e => setLocalTargets({...localTargets, spo2: parseInt(e.target.value)})} onTouchEnd={() => commit('spo2', localTargets.spo2)} className="w-full h-12 accent-yellow-400"/>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">{['normal','brady','desat','vpp_ct'].map(p => <button key={p} onClick={() => applyPreset(p)} className="p-4 bg-slate-800 border border-slate-700 rounded-xl font-bold uppercase text-xs active:bg-slate-700">{t.presets[p]}</button>)}</div>
+                </div>
+            );
+        };
+
+        // --- 6. COMPONENTE PRINCIPAL ---
+
         const App = () => {
             const [mode, setMode] = useState('select');
             const [lang, setLang] = useState(navigator.language.startsWith('es') ? 'es' : (navigator.language.startsWith('pt') ? 'pt' : 'en'));
+            const [patient, setPatient] = useState('neonatal');
             const [user, setUser] = useState(null);
             const [sessionId, setSessionId] = useState('');
             const [vitals, setVitals] = useState(DEFAULT_VITALS);
@@ -671,34 +464,40 @@
             const t = TRANSLATIONS[lang];
 
             useEffect(() => {
-                auth.signInAnonymously().then(cred => setUser(cred.user)).catch(() => setUser({ uid: 'guest' }));
+                auth.signInAnonymously().then(cred => setUser(cred.user));
                 const p = new URLSearchParams(window.location.search);
                 if (p.get('mode') && p.get('session')) { setMode(p.get('mode')); setSessionId(p.get('session')); }
             }, []);
 
             useEffect(() => {
-                if (!sessionId || !db) return;
+                if (!sessionId) return;
                 const unsub = db.collection("sessions").doc(sessionId).onSnapshot(doc => { if (doc.exists) setVitals(doc.data()); });
                 return () => unsub();
             }, [sessionId]);
 
-            if (!user) return <div className="h-screen bg-black flex flex-col items-center justify-center text-green-500"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mb-4"></div><span className="font-mono text-sm tracking-widest uppercase">{t.connecting}</span></div>;
+            if (!user) return <div className="h-screen bg-black flex items-center justify-center text-green-500 font-mono tracking-widest uppercase">CONECTANDO...</div>;
 
             if (mode === 'select') {
                 return (
                     <div className="h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center overflow-y-auto">
                         {showGuide && <AnimatedGuide onClose={() => setShowGuide(false)} t={t} />}
-                        {showScanner && <QRScannerView onScan={(s) => { setMode('control'); setSessionId(s); }} onCancel={() => setShowScanner(false)} t={t} />}
                         <LanguageSelector currentLang={lang} onSelect={setLang} />
+                        <ProfileSelector currentProfile={patient} onSelect={setPatient} lang={lang} />
+                        
                         <header className="mb-10">
-                            <Icons.Activity className="w-16 h-16 text-green-500 mx-auto mb-4 animate-pulse"/><h1 className="text-4xl font-black mb-2 tracking-tight text-white">NeoMonitor</h1><p className="text-slate-400 text-lg font-medium">{t.mainPrompt}</p>
+                            <Icons.Activity className="w-16 h-16 text-green-500 mx-auto mb-4 animate-pulse"/><h1 className="text-4xl font-black mb-2 text-white">NeoMonitor</h1>
+                            <p className="text-slate-400 text-lg font-medium">{t.mainPrompt}</p>
                             <button onClick={() => setShowGuide(true)} className="mt-4 text-blue-400 flex items-center gap-2 mx-auto text-sm font-bold border border-blue-400/30 px-4 py-2 rounded-full hover:bg-blue-400/10 transition-colors"><Icons.Help className="w-4 h-4"/>{t.howToConnect}</button>
                         </header>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-                            <button onClick={() => { setMode('monitor'); setSessionId(sid); }} className="bg-slate-900 border border-slate-800 hover:border-green-500/50 p-8 rounded-3xl flex flex-col items-center gap-6 group transition-all active:scale-95 shadow-2xl"><div className="bg-green-500/10 p-5 rounded-2xl group-hover:bg-green-500/20 transition-colors"><Icons.Monitor className="w-12 h-12 text-green-400"/></div><span className="text-xl font-bold text-white leading-tight">{t.useAsMonitor}</span></button>
-                            <button onClick={() => setShowScanner(true)} className="bg-slate-900 border border-slate-800 hover:border-blue-500/50 p-8 rounded-3xl flex flex-col items-center gap-6 group transition-all active:scale-95 shadow-2xl"><div className="bg-blue-500/10 p-5 rounded-2xl group-hover:bg-blue-500/20 transition-colors"><Icons.Smartphone className="w-12 h-12 text-blue-400"/></div><span className="text-xl font-bold text-white leading-tight">{t.useAsControl}</span></button>
+                            <button onClick={() => { setMode('monitor'); setSessionId(sid); db.collection("sessions").doc(sid).set({...DEFAULT_VITALS, patientType: patient}); }} className="bg-slate-900 border border-slate-800 p-8 rounded-3xl flex flex-col items-center gap-6 group transition-all shadow-2xl active:scale-95 shadow-lg"><div className="bg-green-500/10 p-5 rounded-2xl group-hover:bg-green-500/20 transition-colors"><Icons.Monitor className="w-12 h-12 text-green-400"/></div><span className="text-xl font-bold text-white">{t.useAsMonitor}</span></button>
+                            <button onClick={() => setShowScanner(true)} className="bg-slate-900 border border-slate-800 p-8 rounded-3xl flex flex-col items-center gap-6 group transition-all shadow-2xl active:scale-95 shadow-lg"><div className="bg-blue-500/10 p-5 rounded-2xl group-hover:bg-blue-500/20 transition-colors"><Icons.Smartphone className="w-12 h-12 text-blue-400"/></div><span className="text-xl font-bold text-white">{t.useAsControl}</span></button>
                         </div>
-                        <div className="mt-12 w-full max-w-md"><SponsorSpace className="h-20 rounded-2xl bg-slate-900/50" source="Menu_Initial" t={t} /><p className="text-[10px] text-slate-600 mt-6 uppercase tracking-widest font-bold">NeoMonitor Simulator</p></div>
+
+                        {showScanner && <QRScannerView onScan={(s) => { setMode('control'); setSessionId(s); }} onCancel={() => setShowScanner(false)} t={t} />}
+                        
+                        <p className="mt-12 text-[10px] text-slate-700 font-bold uppercase tracking-widest">Free Education Edition • Dr. Diego Steinberg</p>
                     </div>
                 );
             }
@@ -706,7 +505,7 @@
             return (
                 <div className="font-sans antialiased">
                     {mode === 'monitor' && <MonitorScreen sessionId={sessionId} vitals={vitals} t={t} />}
-                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={(v) => { if (db && sessionId) db.collection("sessions").doc(sessionId).set(v, { merge: true }); }} t={t} />}
+                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={(v) => db.collection("sessions").doc(sessionId).set(v, { merge: true })} t={t} />}
                 </div>
             );
         };
