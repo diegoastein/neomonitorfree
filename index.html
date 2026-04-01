@@ -188,8 +188,12 @@
                     desat: "Desaturación",
                     grunt: "Quejido",
                     vpp: "VPP",
-                    vpp_ct: "VPP + Masaje"
-                }
+                    vpp_ct: "VPP + Masaje",
+                    tachy: "Taquicardia",
+                    shock: "Shock",
+                    afib: "F.Auricular"
+                },
+                patientTypes: { neonatal: "Neonatal", pediatrico: "Pediátrico", adulto: "Adulto" }
             },
             en: {
                 loading: "Loading NeoMonitor...",
@@ -230,8 +234,12 @@
                     desat: "Desaturation",
                     grunt: "Grunt",
                     vpp: "PPV",
-                    vpp_ct: "PPV + Massage"
-                }
+                    vpp_ct: "PPV + Massage",
+                    tachy: "Tachycardia",
+                    shock: "Shock",
+                    afib: "A-Fib"
+                },
+                patientTypes: { neonatal: "Neonatal", pediatrico: "Pediatric", adulto: "Adult" }
             },
             pt: {
                 loading: "Carregando NeoMonitor...",
@@ -272,8 +280,51 @@
                     desat: "Dessaturação",
                     grunt: "Gemido",
                     vpp: "VPP",
-                    vpp_ct: "VPP + Massagem"
-                }
+                    vpp_ct: "VPP + Massagem",
+                    tachy: "Taquicardia",
+                    shock: "Choque",
+                    afib: "F.Atrial"
+                },
+                patientTypes: { neonatal: "Neonatal", pediatrico: "Pediátrico", adulto: "Adulto" }
+            }
+        };
+
+        const PATIENT_CONFIG = {
+            neonatal: {
+                hrCriticalLow: 60, hrWarningLow: 100, hrWarningHigh: 180,
+                spo2Critical: 80, spo2Warning: 89,
+                presets: [
+                    { key: 'normal',  hr: 142, spo2: 94,  style: 'bg-emerald-900/40 border-emerald-500/50 text-emerald-400' },
+                    { key: 'brady',   hr: 68,  spo2: 75,  style: 'bg-yellow-900/40 border-yellow-500/50 text-yellow-400' },
+                    { key: 'desat',   hr: 110, spo2: 84,  style: 'bg-blue-900/40 border-blue-500/50 text-blue-400' },
+                    { key: 'grunt',   hr: null, spo2: null, style: 'bg-orange-900/40 border-orange-500/50 text-orange-400', grunt: true },
+                    { key: 'vpp',     hr: 88,  spo2: 84,  style: 'bg-indigo-900/40 border-indigo-500/50 text-indigo-400' },
+                    { key: 'vpp_ct',  hr: 56,  spo2: 65,  style: 'bg-red-900/40 border-red-500/50 text-red-500' },
+                ]
+            },
+            pediatrico: {
+                hrCriticalLow: 40, hrWarningLow: 70, hrWarningHigh: 160,
+                spo2Critical: 88, spo2Warning: 94,
+                presets: [
+                    { key: 'normal',  hr: 100, spo2: 98, style: 'bg-emerald-900/40 border-emerald-500/50 text-emerald-400' },
+                    { key: 'brady',   hr: 42,  spo2: 90, style: 'bg-yellow-900/40 border-yellow-500/50 text-yellow-400' },
+                    { key: 'tachy',   hr: 182, spo2: 94, style: 'bg-red-900/40 border-red-500/50 text-red-400' },
+                    { key: 'desat',   hr: 118, spo2: 88, style: 'bg-blue-900/40 border-blue-500/50 text-blue-400' },
+                    { key: 'shock',   hr: 155, spo2: 91, style: 'bg-purple-900/40 border-purple-500/50 text-purple-400' },
+                    { key: 'afib',    hr: 145, spo2: 94, style: 'bg-pink-900/40 border-pink-500/50 text-pink-400' },
+                ]
+            },
+            adulto: {
+                hrCriticalLow: 30, hrWarningLow: 50, hrWarningHigh: 120,
+                spo2Critical: 88, spo2Warning: 94,
+                presets: [
+                    { key: 'normal',  hr: 75,  spo2: 98, style: 'bg-emerald-900/40 border-emerald-500/50 text-emerald-400' },
+                    { key: 'brady',   hr: 38,  spo2: 94, style: 'bg-yellow-900/40 border-yellow-500/50 text-yellow-400' },
+                    { key: 'tachy',   hr: 138, spo2: 96, style: 'bg-red-900/40 border-red-500/50 text-red-400' },
+                    { key: 'desat',   hr: 98,  spo2: 86, style: 'bg-blue-900/40 border-blue-500/50 text-blue-400' },
+                    { key: 'shock',   hr: 122, spo2: 88, style: 'bg-purple-900/40 border-purple-500/50 text-purple-400' },
+                    { key: 'afib',    hr: 112, spo2: 95, style: 'bg-pink-900/40 border-pink-500/50 text-pink-400' },
+                ]
             }
         };
 
@@ -303,6 +354,7 @@
             {
                 id: 'rcp_basica',
                 title: { es: 'RCP Neonatal Básica', en: 'Basic Neonatal CPR', pt: 'RCP Neonatal Básica' },
+                presentation: { es: 'RN de 38 sem EG. Parto vaginal prolongado. Nace sin llanto, apneico, hipotonía marcada. Líquido amniótico claro. Equipo de reanimación presente.', en: 'Newborn 38 weeks GA. Prolonged vaginal delivery. Born without cry, apneic, marked hypotonia. Clear amniotic fluid. Resuscitation team present.', pt: 'RN de 38 sem IG. Parto vaginal prolongado. Nasce sem choro, apneico, hipotonia acentuada. Líquido amniótico claro. Equipe de reanimação presente.' },
                 stages: [
                     { name: { es: 'Presentación inicial', en: 'Initial presentation', pt: 'Apresentação inicial' }, hr: 142, spo2: 91, transition: 5 },
                     { name: { es: 'Apnea / Bradicardia severa', en: 'Apnea / Severe bradycardia', pt: 'Apneia / Bradicardia grave' }, hr: 0, spo2: 65, transition: 8 },
@@ -314,6 +366,7 @@
             {
                 id: 'desat_progresiva',
                 title: { es: 'Desaturación Progresiva', en: 'Progressive Desaturation', pt: 'Dessaturação Progressiva' },
+                presentation: { es: 'RN de 35 sem EG, parto por cesárea. Dificultad respiratoria progresiva desde el nacimiento. FR 68 rpm, aleteo nasal, tiraje subcostal bilateral. SpO2 88% en aire ambiente.', en: 'Newborn 35 weeks GA, cesarean delivery. Progressive respiratory distress since birth. RR 68 rpm, nasal flaring, subcostal retractions. SpO2 88% on room air.', pt: 'RN de 35 sem IG, parto cesáreo. Dificuldade respiratória progressiva desde o nascimento. FR 68 rpm, batimento de asa de nariz, tiragem subcostal bilateral. SpO2 88% em ar ambiente.' },
                 stages: [
                     { name: { es: 'Estado basal', en: 'Baseline', pt: 'Estado basal' }, hr: 148, spo2: 93, transition: 5 },
                     { name: { es: 'Desaturación leve', en: 'Mild desaturation', pt: 'Dessaturação leve' }, hr: 132, spo2: 85, transition: 20 },
@@ -326,6 +379,7 @@
             {
                 id: 'dificultad_resp',
                 title: { es: 'Dificultad Respiratoria', en: 'Respiratory Distress', pt: 'Dificuldade Respiratória' },
+                presentation: { es: 'RN de 36 sem EG. Al minuto de vida presenta quejido espiratorio persistente, FR 74 rpm, tiraje intercostal, cianosis perioral. SpO2 88% en aire ambiente. Sin antecedentes maternos de riesgo.', en: 'Newborn 36 weeks GA. At one minute of life presents persistent expiratory grunt, RR 74 rpm, intercostal retractions, perioral cyanosis. SpO2 88% on room air. No maternal risk factors.', pt: 'RN de 36 sem IG. Ao minuto de vida apresenta gemido expiratório persistente, FR 74 rpm, tiragem intercostal, cianose perioral. SpO2 88% em ar ambiente. Sem antecedentes maternos de risco.' },
                 stages: [
                     { name: { es: 'Ingreso a sala', en: 'Room admission', pt: 'Admissão na sala' }, hr: 158, spo2: 88, transition: 5 },
                     { name: { es: 'Quejido + desaturación', en: 'Grunt + desaturation', pt: 'Gemido + dessaturação' }, hr: 145, spo2: 82, transition: 15 },
@@ -454,20 +508,26 @@
 
         const useInterpolatedVitals = (target) => {
             const [vitals, setVitals] = useState(target);
+            const lastBeatRef = useRef(0);
             useEffect(() => {
                 if (!target.transition) { setVitals(target); return; }
+                lastBeatRef.current = 0;
                 let frame;
                 const animate = () => {
                     const elapsed = Date.now() - target.transition.startTime;
                     const p = Math.min(1, elapsed / target.transition.duration);
-                    if (p < 1) {
-                        setVitals({
-                            ...target,
-                            hr: Math.round(target.transition.startHr + (target.transition.targetHr - target.transition.startHr) * p),
-                            spo2: Math.round(target.transition.startSpo2 + (target.transition.targetSpo2 - target.transition.startSpo2) * p),
-                        });
-                        frame = requestAnimationFrame(animate);
-                    } else { setVitals(target); }
+                    const trueHr = Math.round(target.transition.startHr + (target.transition.targetHr - target.transition.startHr) * p);
+                    const trueSpo2 = Math.round(target.transition.startSpo2 + (target.transition.targetSpo2 - target.transition.startSpo2) * p);
+                    const now = Date.now();
+                    // El monitor real actualiza el número una vez por latido, no por frame
+                    const beatInterval = trueHr > 0 ? Math.max(400, 60000 / trueHr) : 2000;
+                    if (now - lastBeatRef.current >= beatInterval) {
+                        lastBeatRef.current = now;
+                        const jitter = trueHr > 0 ? Math.floor(Math.random() * 5) - 2 : 0;
+                        setVitals({ ...target, hr: Math.max(0, trueHr + jitter), spo2: trueSpo2 });
+                    }
+                    if (p < 1) { frame = requestAnimationFrame(animate); }
+                    else { setVitals(target); }
                 };
                 frame = requestAnimationFrame(animate);
                 return () => cancelAnimationFrame(frame);
@@ -475,7 +535,7 @@
             return vitals;
         };
 
-        const MonitorScreen = ({ sessionId, vitals: targetVitals, t }) => {
+        const MonitorScreen = ({ sessionId, vitals: targetVitals, t, patientType = 'neonatal' }) => {
             const vitals = useInterpolatedVitals(targetVitals);
             const [audioEnabled, setAudioEnabled] = useState(false);
             const [time, setTime] = useState(new Date());
@@ -490,9 +550,10 @@
 
             useEffect(() => {
                 if (!vitals.simRunning) { setAlarmState('none'); return; }
+                const cfg = PATIENT_CONFIG[patientType] || PATIENT_CONFIG.neonatal;
                 let level = 'none';
-                if (vitals.hr < 60 || vitals.hr === 0 || vitals.spo2 < 80) level = 'critical';
-                else if (vitals.hr < 100 || vitals.hr > 180 || vitals.spo2 < 89) level = 'warning';
+                if (vitals.hr <= cfg.hrCriticalLow || vitals.hr === 0 || vitals.spo2 < cfg.spo2Critical) level = 'critical';
+                else if (vitals.hr < cfg.hrWarningLow || vitals.hr > cfg.hrWarningHigh || vitals.spo2 < cfg.spo2Warning) level = 'warning';
                 setAlarmState(level);
                 const interval = setInterval(() => setFlash(p => !p), level === 'critical' ? 300 : 800);
                 return () => clearInterval(interval);
@@ -557,7 +618,7 @@
                     )}
 
                     <div className="flex-none flex justify-between px-4 py-2 bg-slate-900/50 text-slate-400 text-sm font-mono border-b border-slate-800 top-bar">
-                        <div className="flex gap-4"><span>NEONATAL</span><span>{t.bed}: 01</span></div>
+                        <div className="flex gap-4"><span>{t.patientTypes ? t.patientTypes[patientType] : 'NEONATAL'}</span><span>{t.bed}: 01</span></div>
                         <div className="flex gap-4 items-center">{vitals.alarmMuted && <Icons.VolumeX className="text-orange-500 w-4 h-4" />}<span>{t.id}: {sessionId}</span></div>
                     </div>
 
@@ -601,12 +662,13 @@
 
         const CaseEditorModal = ({ caseData, onSave, onCancel }) => {
             const [title, setTitle] = useState(caseData.title || '');
+            const [presentation, setPresentation] = useState(caseData.presentation || '');
             const [stages, setStages] = useState(caseData.stages && caseData.stages.length ? caseData.stages.map(s => ({ ...s })) : [{ name: '', hr: 120, spo2: 92, transition: 10 }]);
 
             const addStage = () => setStages(prev => [...prev, { name: '', hr: 120, spo2: 92, transition: 10 }]);
             const removeStage = (i) => setStages(prev => prev.filter((_, idx) => idx !== i));
             const updateStage = (i, field, value) => setStages(prev => prev.map((s, idx) => idx === i ? { ...s, [field]: value } : s));
-            const handleSave = () => { if (!title.trim() || stages.length === 0) return; onSave({ ...caseData, title: title.trim(), stages }); };
+            const handleSave = () => { if (!title.trim() || stages.length === 0) return; onSave({ ...caseData, title: title.trim(), presentation: presentation.trim(), stages }); };
 
             return (
                 <div className="fixed inset-0 bg-black/95 z-[60] p-4 flex flex-col">
@@ -620,6 +682,11 @@
                                 <label className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1 block">Título del caso</label>
                                 <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Ej: Bradicardia neonatal"
                                     className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white outline-none focus:border-blue-500"/>
+                            </div>
+                            <div>
+                                <label className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1 block">Presentación del paciente</label>
+                                <textarea value={presentation} onChange={e => setPresentation(e.target.value)} placeholder="Descripción clínica del paciente para los alumnos..."
+                                    className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white text-sm outline-none focus:border-blue-500 resize-none" rows={3}/>
                             </div>
                             <div>
                                 <div className="flex justify-between items-center mb-2">
@@ -666,7 +733,7 @@
             );
         };
 
-        const ControllerScreen = ({ sessionId, vitals: currentVitals, onUpdate, t, lang, db, userId }) => {
+        const ControllerScreen = ({ sessionId, vitals: currentVitals, onUpdate, t, lang, db, userId, patientType = 'neonatal' }) => {
             const vitals = useInterpolatedVitals(currentVitals);
             const [transitionDuration, setTransitionDuration] = useState(5);
             const [showDebrief, setShowDebrief] = useState(false);
@@ -710,6 +777,8 @@
 
             const getCaseName = (c) => typeof c.title === 'string' ? c.title : (c.title[lang] || c.title.es);
             const getStageName = (stage) => typeof stage.name === 'string' ? stage.name : (stage.name[lang] || stage.name.es);
+            const getPresentation = (c) => { if (!c.presentation) return null; return typeof c.presentation === 'string' ? c.presentation : (c.presentation[lang] || c.presentation.es); };
+            const patientCfg = PATIENT_CONFIG[patientType] || PATIENT_CONFIG.neonatal;
 
             const saveCase = (caseData) => {
                 if (!db || !userId || userId === 'guest') return;
@@ -779,19 +848,13 @@
                 setLocalTargets({ hr: stage.hr, spo2: stage.spo2 });
             };
 
-            const applyPreset = (type, name) => {
-                let p = {};
-                switch(type) {
-                    case 'normal': p = { hr: 142, spo2: 94 }; break;
-                    case 'brady': p = { hr: 68, spo2: 75 }; break;
-                    case 'desat': p = { hr: 110, spo2: 84 }; break;
-                    case 'vpp': p = { hr: 88, spo2: 84 }; break;
-                    case 'vpp_ct': p = { hr: 56, spo2: 65 }; break;
-                }
+            const applyPreset = (preset) => {
+                if (preset.grunt) { onUpdate({ ...currentVitals, soundType: 'grunt', soundTimestamp: Date.now() }); logAction(`Preset: ${t.presets[preset.key] || preset.key}`); return; }
                 const now = Date.now();
-                onUpdate({ ...currentVitals, ...p, transition: currentVitals.simRunning ? { startTime: now, duration: transitionDuration * 1000, startHr: vitals.hr, targetHr: p.hr, startSpo2: vitals.spo2, targetSpo2: p.spo2 } : null });
-                logAction(`Scenario: ${name}`);
-                trackNeoEvent('scenario_preset', `Preset: ${name}`, { preset_type: type });
+                const name = t.presets[preset.key] || preset.key;
+                onUpdate({ ...currentVitals, hr: preset.hr, spo2: preset.spo2, transition: currentVitals.simRunning ? { startTime: now, duration: transitionDuration * 1000, startHr: vitals.hr, targetHr: preset.hr, startSpo2: vitals.spo2, targetSpo2: preset.spo2 } : null });
+                logAction(`Preset: ${name}`);
+                trackNeoEvent('scenario_preset', `Preset: ${name}`, { preset_type: preset.key });
             };
 
             return (
@@ -932,12 +995,11 @@
 
                         {!activeCase ? (
                             <div className="grid grid-cols-2 gap-3">
-                                <button onClick={() => applyPreset('normal', t.presets.normal)} className="p-4 bg-emerald-900/40 border border-emerald-500/50 rounded-lg text-emerald-400 font-bold">{t.presets.normal}</button>
-                                <button onClick={() => applyPreset('brady', t.presets.brady)} className="p-4 bg-yellow-900/40 border border-yellow-500/50 rounded-lg text-yellow-400 font-bold">{t.presets.brady}</button>
-                                <button onClick={() => applyPreset('desat', t.presets.desat)} className="p-4 bg-blue-900/40 border border-blue-500/50 rounded-lg text-blue-400 font-bold text-sm">{t.presets.desat}</button>
-                                <button onClick={() => onUpdate({ ...currentVitals, soundType: 'grunt', soundTimestamp: Date.now() })} className="p-4 bg-orange-900/40 border border-orange-500/50 rounded-lg text-orange-400 font-bold">{t.presets.grunt}</button>
-                                <button onClick={() => applyPreset('vpp', t.presets.vpp)} className="p-4 bg-indigo-900/40 border border-indigo-500/50 rounded-lg text-indigo-400 font-bold">{t.presets.vpp}</button>
-                                <button onClick={() => applyPreset('vpp_ct', t.presets.vpp_ct)} className="p-4 bg-red-900/40 border border-red-500/50 rounded-lg text-red-500 font-bold">{t.presets.vpp_ct}</button>
+                                {patientCfg.presets.map(preset => (
+                                    <button key={preset.key} onClick={() => applyPreset(preset)} className={`p-4 border rounded-lg font-bold text-sm ${preset.style}`}>
+                                        {t.presets[preset.key] || preset.key}
+                                    </button>
+                                ))}
                             </div>
                         ) : (
                             <div className="bg-slate-800 rounded-xl overflow-hidden">
@@ -945,7 +1007,13 @@
                                     <span className="font-bold text-blue-300 text-sm">{getCaseName(activeCase)}</span>
                                     <button onClick={() => { setActiveCase(null); setStageIndex(-1); }} className="text-slate-400 hover:text-white text-xs border border-slate-600 px-2 py-0.5 rounded">Salir</button>
                                 </div>
-                                <div className="p-3 space-y-2 max-h-64 overflow-y-auto">
+                                {getPresentation(activeCase) && (
+                                    <div className="p-3 border-b border-slate-700 bg-slate-900/40">
+                                        <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Presentación</p>
+                                        <p className="text-xs text-slate-300 leading-relaxed">{getPresentation(activeCase)}</p>
+                                    </div>
+                                )}
+                                <div className="p-3 space-y-2 max-h-56 overflow-y-auto">
                                     {activeCase.stages.map((stage, i) => (
                                         <div key={i} className={`flex items-center gap-3 p-2 rounded-lg text-sm transition-all ${i === stageIndex ? 'bg-blue-900/50 border border-blue-500/50' : i < stageIndex ? 'opacity-40' : 'opacity-70'}`}>
                                             <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-none text-xs font-bold ${i < stageIndex ? 'bg-green-700 text-green-200' : i === stageIndex ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-400'}`}>
@@ -1031,6 +1099,21 @@
             </div>
         );
 
+        const PatientTypeSelector = ({ current, onSelect, t }) => {
+            const types = ['neonatal', 'pediatrico', 'adulto'];
+            const labels = { neonatal: 'Neo', pediatrico: 'Ped', adulto: 'Adult' };
+            return (
+                <div className="absolute top-6 left-6 z-[80] flex rounded-xl overflow-hidden border border-slate-700 shadow-lg">
+                    {types.map(type => (
+                        <button key={type} onClick={() => onSelect(type)}
+                            className={`px-3 py-2 text-xs font-bold transition-colors ${current === type ? 'bg-blue-700 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}`}>
+                            {labels[type]}
+                        </button>
+                    ))}
+                </div>
+            );
+        };
+
         const LanguageSelector = ({ currentLang, onSelect }) => {
             const [isOpen, setIsOpen] = useState(false);
             const menuRef = useRef(null);
@@ -1085,6 +1168,7 @@
             const [user, setUser] = useState(null);
             const [sessionId, setSessionId] = useState('');
             const [vitals, setVitals] = useState(DEFAULT_VITALS);
+            const [patientType, setPatientType] = useState('neonatal');
             const [showScanner, setShowScanner] = useState(false);
             const [showGuide, setShowGuide] = useState(false);
             const [sid] = useState(Math.floor(1000 + Math.random() * 9000).toString());
@@ -1110,7 +1194,8 @@
                     <div className="h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center overflow-y-auto">
                         {showGuide && <AnimatedGuide onClose={() => setShowGuide(false)} t={t} />}
                         {showScanner && <QRScannerView onScan={(s) => { setMode('control'); setSessionId(s); }} onCancel={() => setShowScanner(false)} t={t} />}
-                        
+
+                        <PatientTypeSelector current={patientType} onSelect={setPatientType} t={t} />
                         <LanguageSelector currentLang={lang} onSelect={setLang} />
 
                         <header className="mb-10">
@@ -1132,8 +1217,8 @@
 
             return (
                 <div className="font-sans antialiased">
-                    {mode === 'monitor' && <MonitorScreen sessionId={sessionId} vitals={vitals} t={t} />}
-                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={(v) => { if (db && sessionId) db.collection("sessions").doc(sessionId).set(v, { merge: true }); }} t={t} lang={lang} db={db} userId={user.uid} />}
+                    {mode === 'monitor' && <MonitorScreen sessionId={sessionId} vitals={vitals} t={t} patientType={patientType} />}
+                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={(v) => { if (db && sessionId) db.collection("sessions").doc(sessionId).set(v, { merge: true }); }} t={t} lang={lang} db={db} userId={user.uid} patientType={patientType} />}
                 </div>
             );
         };
