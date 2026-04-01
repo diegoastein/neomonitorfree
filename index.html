@@ -541,7 +541,7 @@
             return vitals;
         };
 
-        const MonitorScreen = ({ sessionId, vitals: targetVitals, t, patientType = 'neonatal' }) => {
+        const MonitorScreen = ({ sessionId, vitals: targetVitals, t, patientType = 'neonatal', onPatientTypeChange }) => {
             const vitals = useInterpolatedVitals(targetVitals);
             const [audioEnabled, setAudioEnabled] = useState(false);
             const [time, setTime] = useState(new Date());
@@ -599,6 +599,10 @@
                         <div className="absolute inset-0 bg-black/90 z-50 flex items-center justify-center text-center px-4">
                             <button onClick={start} className="bg-green-600 px-8 py-4 rounded-xl font-bold text-xl animate-pulse">{t.startMonitorBtn}</button>
                         </div>
+                    )}
+
+                    {audioEnabled && onPatientTypeChange && (
+                        <PatientTypeSelector current={patientType} onSelect={onPatientTypeChange} t={t} />
                     )}
 
                     {audioEnabled && !vitals.simRunning && (
@@ -739,7 +743,7 @@
             );
         };
 
-        const ControllerScreen = ({ sessionId, vitals: currentVitals, onUpdate, t, lang, db, userId, patientType = 'neonatal' }) => {
+        const ControllerScreen = ({ sessionId, vitals: currentVitals, onUpdate, t, lang, db, userId, patientType = 'neonatal', onPatientTypeChange }) => {
             const vitals = useInterpolatedVitals(currentVitals);
             const [transitionDuration, setTransitionDuration] = useState(5);
             const [showDebrief, setShowDebrief] = useState(false);
@@ -866,13 +870,33 @@
 
             return (
                 <div className="h-screen overflow-y-auto bg-slate-900 text-white flex flex-col">
-                    <header className="flex-none flex justify-between items-center p-4 bg-slate-800">
-                        <div className="flex items-center gap-2">
-                            <h2 className="font-bold text-blue-400 flex items-center gap-2"><Icons.Smartphone className="w-4 h-4"/> {t.control}</h2>
-                            {currentVitals.simRunning && <span className="ml-2 px-2 py-0.5 bg-red-900/50 text-red-400 text-xs rounded border border-red-500 font-mono animate-pulse">{displayTime}</span>}
-                            <button onClick={() => setShowDebrief(true)} className="ml-4 bg-slate-700 text-xs px-2 py-1 rounded flex items-center gap-1"><Icons.List className="w-3 h-3"/> {t.debriefing}</button>
+                    <header className="flex-none flex flex-col bg-slate-800">
+                        <div className="flex justify-between items-center px-4 pt-3 pb-2">
+                            <div className="flex items-center gap-2">
+                                <h2 className="font-bold text-blue-400 flex items-center gap-2"><Icons.Smartphone className="w-4 h-4"/> {t.control}</h2>
+                                {currentVitals.simRunning && <span className="ml-2 px-2 py-0.5 bg-red-900/50 text-red-400 text-xs rounded border border-red-500 font-mono animate-pulse">{displayTime}</span>}
+                                <button onClick={() => setShowDebrief(true)} className="ml-4 bg-slate-700 text-xs px-2 py-1 rounded flex items-center gap-1"><Icons.List className="w-3 h-3"/> {t.debriefing}</button>
+                            </div>
+                            <span className="text-sm font-mono border border-slate-600 px-2 py-0.5 rounded">ID: {sessionId}</span>
                         </div>
-                        <span className="text-sm font-mono border border-slate-600 px-2 py-0.5 rounded">ID: {sessionId}</span>
+                        <div className="flex items-center justify-between px-4 pb-3 border-t border-slate-700/50 pt-2">
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">Paciente:</span>
+                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${patientType === 'neonatal' ? 'bg-green-900/60 text-green-300 border border-green-600/50' : patientType === 'pediatrico' ? 'bg-yellow-900/60 text-yellow-300 border border-yellow-600/50' : 'bg-blue-900/60 text-blue-300 border border-blue-600/50'}`}>
+                                    {t.patientTypes ? t.patientTypes[patientType].toUpperCase() : patientType.toUpperCase()}
+                                </span>
+                            </div>
+                            {onPatientTypeChange && (
+                                <div className="flex rounded-lg overflow-hidden border border-slate-600">
+                                    {['neonatal', 'pediatrico', 'adulto'].map(type => (
+                                        <button key={type} onClick={() => onPatientTypeChange(type)}
+                                            className={`px-3 py-1 text-xs font-bold transition-colors ${patientType === type ? (type === 'neonatal' ? 'bg-green-700 text-white' : type === 'pediatrico' ? 'bg-yellow-700 text-white' : 'bg-blue-700 text-white') : 'bg-slate-900 text-slate-400 hover:bg-slate-700'}`}>
+                                            {type === 'neonatal' ? 'Neo' : type === 'pediatrico' ? 'Ped' : 'Adult'}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </header>
 
                     {showCaseEditor && editingCase && <CaseEditorModal caseData={editingCase} onSave={saveCase} onCancel={() => { setShowCaseEditor(false); setEditingCase(null); }} />}
@@ -1249,8 +1273,8 @@
 
             return (
                 <div className="font-sans antialiased">
-                    {mode === 'monitor' && <MonitorScreen sessionId={sessionId} vitals={vitals} t={t} patientType={patientType} />}
-                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={(v) => { if (db && sessionId) db.collection("sessions").doc(sessionId).set(v, { merge: true }); }} t={t} lang={lang} db={db} userId={user.uid} patientType={patientType} />}
+                    {mode === 'monitor' && <MonitorScreen sessionId={sessionId} vitals={vitals} t={t} patientType={patientType} onPatientTypeChange={setPatientType} />}
+                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={(v) => { if (db && sessionId) db.collection("sessions").doc(sessionId).set(v, { merge: true }); }} t={t} lang={lang} db={db} userId={user.uid} patientType={patientType} onPatientTypeChange={setPatientType} />}
                 </div>
             );
         };
