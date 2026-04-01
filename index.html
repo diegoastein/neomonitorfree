@@ -1313,13 +1313,17 @@
             const [user, setUser] = useState(null);
             const [sessionId, setSessionId] = useState('');
             const [vitals, setVitals] = useState(DEFAULT_VITALS);
-            // patientType local: usado en pantalla select antes de tener sesión
-            const [patientType, setPatientType] = useState('neonatal');
+            // preSessionPatientType: solo usado en pantalla select, antes de tener sesión
+            const [preSessionPatientType, setPreSessionPatientType] = useState('neonatal');
             const [showScanner, setShowScanner] = useState(false);
             const [showGuide, setShowGuide] = useState(false);
             const [sid] = useState(Math.floor(1000 + Math.random() * 9000).toString());
 
             const t = TRANSLATIONS[lang];
+
+            // FUENTE ÚNICA DE VERDAD: cuando hay sesión, patientType viene de Firestore (vitals).
+            // Esto elimina el stale-closure que causaba comportamiento errático.
+            const patientType = sessionId ? (vitals.patientType || 'neonatal') : preSessionPatientType;
 
             useEffect(() => {
                 auth.signInAnonymously().then(cred => setUser(cred.user)).catch(() => setUser({ uid: 'guest' }));
@@ -1327,25 +1331,20 @@
                 if (p.get('mode') && p.get('session')) { setMode(p.get('mode')); setSessionId(p.get('session')); }
             }, []);
 
+            // Listener limpio: solo setVitals. patientType se deriva automáticamente de vitals.
             useEffect(() => {
                 if (!sessionId || !db) return;
                 const unsub = db.collection("sessions").doc(sessionId).onSnapshot(doc => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        setVitals(data);
-                        // Sincronizar tipo de paciente desde Firestore (cambio remoto)
-                        if (data.patientType && data.patientType !== patientType) {
-                            setPatientType(data.patientType);
-                        }
-                    }
+                    if (doc.exists) setVitals(doc.data());
                 });
                 return () => unsub();
             }, [sessionId]);
 
-            // Cambiar tipo de paciente: actualiza estado local + Firestore; bloqueado durante simulación
+            // Cambiar patientType: actualización optimista local + escritura a Firestore.
+            // La otra pantalla recibe el cambio vía su listener onSnapshot → setVitals.
             const handlePatientTypeChange = (type) => {
                 if (vitals.simRunning) return;
-                setPatientType(type);
+                setVitals(prev => ({ ...prev, patientType: type }));
                 if (db && sessionId) {
                     db.collection("sessions").doc(sessionId).set({ patientType: type }, { merge: true });
                 }
@@ -1364,7 +1363,7 @@
                         {showGuide && <AnimatedGuide onClose={() => setShowGuide(false)} t={t} />}
                         {showScanner && <QRScannerView onScan={(s) => { setMode('control'); setSessionId(s); }} onCancel={() => setShowScanner(false)} t={t} />}
 
-                        <PatientTypeSelector current={patientType} onSelect={setPatientType} t={t} />
+                        <PatientTypeSelector current={preSessionPatientType} onSelect={setPreSessionPatientType} t={t} />
                         <LanguageSelector currentLang={lang} onSelect={setLang} />
 
                         <header className="mb-10">
@@ -1375,7 +1374,13 @@
                         </header>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-                            <button onClick={() => { setMode('monitor'); setSessionId(sid); handleUpdate({ ...DEFAULT_VITALS, patientType }); }} className="bg-slate-900 border border-slate-800 hover:border-green-500/50 p-8 rounded-3xl flex flex-col items-center gap-6 group transition-all active:scale-95 shadow-2xl"><div className="bg-green-500/10 p-5 rounded-2xl group-hover:bg-green-500/20 transition-colors"><Icons.Monitor className="w-12 h-12 text-green-400"/></div><span className="text-xl font-bold text-white leading-tight">{t.useAsMonitor}</span></button>
+                            <button onClick={() => {
+                                const initDoc = { ...DEFAULT_VITALS, patientType: preSessionPatientType };
+                                setVitals(initDoc);
+                                setSessionId(sid);
+                                setMode('monitor');
+                                if (db) db.collection("sessions").doc(sid).set(initDoc);
+                            }} className="bg-slate-900 border border-slate-800 hover:border-green-500/50 p-8 rounded-3xl flex flex-col items-center gap-6 group transition-all active:scale-95 shadow-2xl"><div className="bg-green-500/10 p-5 rounded-2xl group-hover:bg-green-500/20 transition-colors"><Icons.Monitor className="w-12 h-12 text-green-400"/></div><span className="text-xl font-bold text-white leading-tight">{t.useAsMonitor}</span></button>
                             <button onClick={() => setShowScanner(true)} className="bg-slate-900 border border-slate-800 hover:border-blue-500/50 p-8 rounded-3xl flex flex-col items-center gap-6 group transition-all active:scale-95 shadow-2xl"><div className="bg-blue-500/10 p-5 rounded-2xl group-hover:bg-blue-500/20 transition-colors"><Icons.Smartphone className="w-12 h-12 text-blue-400"/></div><span className="text-xl font-bold text-white leading-tight">{t.useAsControl}</span></button>
                         </div>
 
