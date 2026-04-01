@@ -191,7 +191,8 @@
                     vpp_ct: "VPP + Masaje",
                     tachy: "Taquicardia",
                     shock: "Shock",
-                    afib: "F.Auricular"
+                    afib: "F.Auricular",
+                    rcp: "⚡ RCP"
                 },
                 patientTypes: { neonatal: "Neonatal", pediatrico: "Pediátrico", adulto: "Adulto" }
             },
@@ -237,7 +238,8 @@
                     vpp_ct: "PPV + Massage",
                     tachy: "Tachycardia",
                     shock: "Shock",
-                    afib: "A-Fib"
+                    afib: "A-Fib",
+                    rcp: "⚡ CPR"
                 },
                 patientTypes: { neonatal: "Neonatal", pediatrico: "Pediatric", adulto: "Adult" }
             },
@@ -283,47 +285,51 @@
                     vpp_ct: "VPP + Massagem",
                     tachy: "Taquicardia",
                     shock: "Choque",
-                    afib: "F.Atrial"
+                    afib: "F.Atrial",
+                    rcp: "⚡ RCP"
                 },
                 patientTypes: { neonatal: "Neonatal", pediatrico: "Pediátrico", adulto: "Adulto" }
             }
         };
 
         const PATIENT_CONFIG = {
+            // NRP 2020: VPP si FC<100, masaje si FC<60
             neonatal: {
                 hrCriticalLow: 60, hrWarningLow: 100, hrWarningHigh: 180,
                 spo2Critical: 80, spo2Warning: 89,
                 presets: [
                     { key: 'normal',  hr: 142, spo2: 94,  style: 'bg-emerald-900/40 border-emerald-500/50 text-emerald-400' },
-                    { key: 'brady',   hr: 68,  spo2: 75,  style: 'bg-yellow-900/40 border-yellow-500/50 text-yellow-400' },
                     { key: 'desat',   hr: 110, spo2: 84,  style: 'bg-blue-900/40 border-blue-500/50 text-blue-400' },
                     { key: 'grunt',   hr: null, spo2: null, style: 'bg-orange-900/40 border-orange-500/50 text-orange-400', grunt: true },
                     { key: 'vpp',     hr: 88,  spo2: 84,  style: 'bg-indigo-900/40 border-indigo-500/50 text-indigo-400' },
-                    { key: 'vpp_ct',  hr: 56,  spo2: 65,  style: 'bg-red-900/40 border-red-500/50 text-red-500' },
+                    { key: 'brady',   hr: 68,  spo2: 75,  style: 'bg-yellow-900/40 border-yellow-500/50 text-yellow-400' },
+                    { key: 'vpp_ct',  hr: 52,  spo2: 62,  style: 'bg-red-900/40 border-red-500/50 text-red-500' },
                 ]
             },
+            // PALS: RCP si FC<60 con mala perfusión; tachy >160 (SVT >220)
             pediatrico: {
-                hrCriticalLow: 40, hrWarningLow: 70, hrWarningHigh: 160,
+                hrCriticalLow: 60, hrWarningLow: 70, hrWarningHigh: 160,
                 spo2Critical: 88, spo2Warning: 94,
                 presets: [
-                    { key: 'normal',  hr: 100, spo2: 98, style: 'bg-emerald-900/40 border-emerald-500/50 text-emerald-400' },
-                    { key: 'brady',   hr: 42,  spo2: 90, style: 'bg-yellow-900/40 border-yellow-500/50 text-yellow-400' },
-                    { key: 'tachy',   hr: 182, spo2: 94, style: 'bg-red-900/40 border-red-500/50 text-red-400' },
-                    { key: 'desat',   hr: 118, spo2: 88, style: 'bg-blue-900/40 border-blue-500/50 text-blue-400' },
-                    { key: 'shock',   hr: 155, spo2: 91, style: 'bg-purple-900/40 border-purple-500/50 text-purple-400' },
-                    { key: 'afib',    hr: 145, spo2: 94, style: 'bg-pink-900/40 border-pink-500/50 text-pink-400' },
+                    { key: 'normal',  hr: 100, spo2: 98,  style: 'bg-emerald-900/40 border-emerald-500/50 text-emerald-400' },
+                    { key: 'desat',   hr: 112, spo2: 88,  style: 'bg-blue-900/40 border-blue-500/50 text-blue-400' },
+                    { key: 'brady',   hr: 52,  spo2: 90,  style: 'bg-yellow-900/40 border-yellow-500/50 text-yellow-400' },
+                    { key: 'tachy',   hr: 210, spo2: 92,  style: 'bg-red-900/40 border-red-500/50 text-red-400' },
+                    { key: 'shock',   hr: 148, spo2: 91,  style: 'bg-purple-900/40 border-purple-500/50 text-purple-400' },
+                    { key: 'rcp',     hr: 0,   spo2: 60,  style: 'bg-red-950/60 border-red-600/70 text-red-300 font-black' },
                 ]
             },
+            // ACLS: bradicardia sintomática <50, crítico <40; tachy sintomática >150
             adulto: {
-                hrCriticalLow: 30, hrWarningLow: 50, hrWarningHigh: 120,
+                hrCriticalLow: 40, hrWarningLow: 50, hrWarningHigh: 150,
                 spo2Critical: 88, spo2Warning: 94,
                 presets: [
-                    { key: 'normal',  hr: 75,  spo2: 98, style: 'bg-emerald-900/40 border-emerald-500/50 text-emerald-400' },
-                    { key: 'brady',   hr: 38,  spo2: 94, style: 'bg-yellow-900/40 border-yellow-500/50 text-yellow-400' },
-                    { key: 'tachy',   hr: 138, spo2: 96, style: 'bg-red-900/40 border-red-500/50 text-red-400' },
-                    { key: 'desat',   hr: 98,  spo2: 86, style: 'bg-blue-900/40 border-blue-500/50 text-blue-400' },
-                    { key: 'shock',   hr: 122, spo2: 88, style: 'bg-purple-900/40 border-purple-500/50 text-purple-400' },
-                    { key: 'afib',    hr: 112, spo2: 95, style: 'bg-pink-900/40 border-pink-500/50 text-pink-400' },
+                    { key: 'normal',  hr: 75,  spo2: 98,  style: 'bg-emerald-900/40 border-emerald-500/50 text-emerald-400' },
+                    { key: 'desat',   hr: 95,  spo2: 85,  style: 'bg-blue-900/40 border-blue-500/50 text-blue-400' },
+                    { key: 'brady',   hr: 36,  spo2: 94,  style: 'bg-yellow-900/40 border-yellow-500/50 text-yellow-400' },
+                    { key: 'tachy',   hr: 158, spo2: 95,  style: 'bg-red-900/40 border-red-500/50 text-red-400' },
+                    { key: 'afib',    hr: 118, spo2: 94,  style: 'bg-pink-900/40 border-pink-500/50 text-pink-400' },
+                    { key: 'rcp',     hr: 0,   spo2: 60,  style: 'bg-red-950/60 border-red-600/70 text-red-300 font-black' },
                 ]
             }
         };
@@ -749,6 +755,7 @@
             const [editingCase, setEditingCase] = useState(null);
             const [debriefTab, setDebriefTab] = useState('eventos');
             const [gasNotes, setGasNotes] = useState({ gather: '', analyze: '', summarize: '' });
+            const [showPresentation, setShowPresentation] = useState(false);
 
             useEffect(() => { setLocalTargets({ hr: currentVitals.hr, spo2: currentVitals.spo2 }); }, [currentVitals.hr, currentVitals.spo2]);
 
@@ -1009,8 +1016,33 @@
                                 </div>
                                 {getPresentation(activeCase) && (
                                     <div className="p-3 border-b border-slate-700 bg-slate-900/40">
-                                        <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Presentación</p>
-                                        <p className="text-xs text-slate-300 leading-relaxed">{getPresentation(activeCase)}</p>
+                                        <button onClick={() => setShowPresentation(true)}
+                                            className="w-full flex items-center justify-between bg-blue-900/30 hover:bg-blue-900/50 border border-blue-500/40 rounded-lg px-3 py-2 transition-colors active:scale-95">
+                                            <span className="text-xs font-bold text-blue-300 uppercase tracking-widest">Ver presentación del caso</span>
+                                            <span className="text-blue-400 text-lg">📋</span>
+                                        </button>
+                                    </div>
+                                )}
+                                {showPresentation && getPresentation(activeCase) && (
+                                    <div className="fixed inset-0 bg-black/95 z-[70] flex flex-col p-6" onClick={() => setShowPresentation(false)}>
+                                        <div className="bg-slate-800 rounded-2xl flex flex-col overflow-hidden max-w-lg mx-auto w-full max-h-full shadow-2xl" onClick={e => e.stopPropagation()}>
+                                            <div className="p-5 border-b border-slate-700 flex justify-between items-center flex-none">
+                                                <div>
+                                                    <p className="text-xs text-blue-400 uppercase tracking-widest font-bold mb-0.5">Presentación del caso</p>
+                                                    <h3 className="font-black text-white text-lg">{getCaseName(activeCase)}</h3>
+                                                </div>
+                                                <button onClick={() => setShowPresentation(false)} className="bg-slate-700 rounded-full p-2 ml-4 flex-none"><Icons.X className="w-5 h-5"/></button>
+                                            </div>
+                                            <div className="flex-1 overflow-y-auto p-6">
+                                                <p className="text-white text-lg leading-relaxed">{getPresentation(activeCase)}</p>
+                                            </div>
+                                            <div className="p-4 border-t border-slate-700 flex-none">
+                                                <button onClick={() => setShowPresentation(false)}
+                                                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors">
+                                                    Entendido
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                                 <div className="p-3 space-y-2 max-h-56 overflow-y-auto">
