@@ -567,6 +567,24 @@
             },
         ];
 
+        const NON_TECHNICAL_SKILLS = [
+            'Conocer el ambiente',
+            'Anticiparse y planificar',
+            'Llamar para pedir ayuda',
+            'Distribución de roles',
+            'Movilizar los recursos disponibles',
+            'Comunicación efectiva',
+            'Usar la información disponible',
+            'Prevención y fijación de errores',
+            'Chequeo doble y cruzado',
+            'Uso de ayuda memorias',
+            'Reevaluaciones repetidas',
+            'Trabajo en equipo',
+            'Enfocar la atención con sabiduría',
+            'Priorizar dinámicamente',
+            'Distribución de tareas',
+        ];
+
         const SponsorSpace = ({ className = "", compact = false, source = "Monitor", t }) => (
             <div className={`sponsor-container ${className}`} onClick={() => {
                 trackNeoEvent('sponsor_click', source);
@@ -914,7 +932,7 @@
             );
         };
 
-        const ControllerScreen = ({ sessionId, vitals: currentVitals, onUpdate, t, lang, db, userId, patientType = 'neonatal', onPatientTypeChange }) => {
+        const ControllerScreen = ({ sessionId, vitals: currentVitals, onUpdate, t, lang, db, userId, patientType = 'neonatal', onPatientTypeChange, onLangChange }) => {
             const vitals = useInterpolatedVitals(currentVitals);
             const [transitionDuration, setTransitionDuration] = useState(5);
             const [showDebrief, setShowDebrief] = useState(false);
@@ -931,6 +949,8 @@
             const [debriefTab, setDebriefTab] = useState('eventos');
             const [gasNotes, setGasNotes] = useState({ gather: '', analyze: '', summarize: '' });
             const [showPresentation, setShowPresentation] = useState(false);
+            const [selectedNTSkills, setSelectedNTSkills] = useState([]);
+            const [technicalSkills, setTechnicalSkills] = useState(['', '', '']);
 
             useEffect(() => { setLocalTargets({ hr: currentVitals.hr, spo2: currentVitals.spo2 }); }, [currentVitals.hr, currentVitals.spo2]);
 
@@ -1048,7 +1068,19 @@
                                 {currentVitals.simRunning && <span className="ml-2 px-2 py-0.5 bg-red-900/50 text-red-400 text-xs rounded border border-red-500 font-mono animate-pulse">{displayTime}</span>}
                                 <button onClick={() => setShowDebrief(true)} className="ml-4 bg-slate-700 text-xs px-2 py-1 rounded flex items-center gap-1"><Icons.List className="w-3 h-3"/> {t.debriefing}</button>
                             </div>
+                            <div className="flex items-center gap-2">
+                            {onLangChange && (
+                                <div className="flex rounded-lg overflow-hidden border border-slate-600">
+                                    {['es','en','pt'].map(l => (
+                                        <button key={l} onClick={() => onLangChange(l)}
+                                            className={`px-2 py-1 text-xs font-bold uppercase transition-colors ${lang === l ? 'bg-slate-500 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-700'}`}>
+                                            {l}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                             <span className="text-sm font-mono border border-slate-600 px-2 py-0.5 rounded">ID: {sessionId}</span>
+                        </div>
                         </div>
                         <div className="flex items-center justify-between px-4 pb-3 border-t border-slate-700/50 pt-2">
                             <div className="flex items-center gap-2">
@@ -1123,10 +1155,77 @@
                                     <button onClick={() => setShowDebrief(false)}><Icons.X className="w-6 h-6"/></button>
                                 </div>
                                 <div className="flex border-b border-slate-700 flex-none">
+                                    <button onClick={() => setDebriefTab('objetivos')} className={`flex-1 py-2 text-sm font-bold transition-colors ${debriefTab === 'objetivos' ? 'bg-slate-700 text-white border-b-2 border-purple-400' : 'text-slate-400 hover:bg-slate-700/50'}`}>Objetivos</button>
                                     <button onClick={() => setDebriefTab('eventos')} className={`flex-1 py-2 text-sm font-bold transition-colors ${debriefTab === 'eventos' ? 'bg-slate-700 text-white border-b-2 border-blue-400' : 'text-slate-400 hover:bg-slate-700/50'}`}>Eventos</button>
                                     <button onClick={() => setDebriefTab('gas')} className={`flex-1 py-2 text-sm font-bold transition-colors ${debriefTab === 'gas' ? 'bg-slate-700 text-white border-b-2 border-amber-400' : 'text-slate-400 hover:bg-slate-700/50'}`}>GAS</button>
                                 </div>
-                                {debriefTab === 'eventos' ? (
+                                {debriefTab === 'objetivos' ? (
+                                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/20">
+                                        {(() => {
+                                            const totalSelected = selectedNTSkills.length + technicalSkills.filter(s => s.trim()).length;
+                                            const toggleNT = (skill) => {
+                                                if (selectedNTSkills.includes(skill)) {
+                                                    setSelectedNTSkills(prev => prev.filter(s => s !== skill));
+                                                } else {
+                                                    if (totalSelected >= 4) return;
+                                                    setSelectedNTSkills(prev => [...prev, skill]);
+                                                }
+                                            };
+                                            return (
+                                                <>
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <p className="text-xs text-slate-400 uppercase tracking-widest font-bold">Habilidades no técnicas</p>
+                                                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${totalSelected >= 4 ? 'bg-red-900/60 text-red-300' : 'bg-slate-700 text-slate-300'}`}>{totalSelected}/4 obj.</span>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 gap-1.5">
+                                                        {NON_TECHNICAL_SKILLS.map(skill => {
+                                                            const active = selectedNTSkills.includes(skill);
+                                                            const disabled = !active && totalSelected >= 4;
+                                                            return (
+                                                                <button key={skill} onClick={() => toggleNT(skill)}
+                                                                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 ${active ? 'bg-purple-800/60 border border-purple-500/60 text-purple-200' : disabled ? 'bg-slate-800/30 text-slate-600 cursor-not-allowed' : 'bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60'}`}>
+                                                                    <span className={`w-4 h-4 rounded border flex-none flex items-center justify-center ${active ? 'bg-purple-500 border-purple-400' : 'border-slate-600'}`}>
+                                                                        {active && <span className="text-white text-[10px] font-black">✓</span>}
+                                                                    </span>
+                                                                    {skill}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                    <div className="mt-3">
+                                                        <p className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-2">Habilidades técnicas</p>
+                                                        <div className="space-y-2">
+                                                            {technicalSkills.map((skill, i) => {
+                                                                const canAdd = skill.trim() || totalSelected < 4 || technicalSkills.filter(s => s.trim()).includes(skill);
+                                                                return (
+                                                                    <input key={i} type="text" value={skill}
+                                                                        onChange={e => {
+                                                                            const newVal = e.target.value;
+                                                                            const newList = [...technicalSkills];
+                                                                            newList[i] = newVal;
+                                                                            const newTotal = selectedNTSkills.length + newList.filter(s => s.trim()).length;
+                                                                            if (newVal.trim() && !skill.trim() && newTotal > 4) return;
+                                                                            setTechnicalSkills(newList);
+                                                                        }}
+                                                                        placeholder={`Habilidad técnica ${i + 1}…`}
+                                                                        className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-xs outline-none focus:border-purple-500 placeholder-slate-500"
+                                                                    />
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                    {(selectedNTSkills.length > 0 || technicalSkills.some(s => s.trim())) && (
+                                                        <div className="mt-3 bg-purple-900/20 border border-purple-500/30 rounded-xl p-3">
+                                                            <p className="text-xs text-purple-300 font-bold uppercase tracking-widest mb-2">Objetivos seleccionados</p>
+                                                            {selectedNTSkills.map(s => <p key={s} className="text-xs text-white flex gap-2 mb-1"><span className="text-purple-400">▸</span>{s}</p>)}
+                                                            {technicalSkills.filter(s => s.trim()).map((s, i) => <p key={i} className="text-xs text-white flex gap-2 mb-1"><span className="text-purple-400">▸</span>{s}</p>)}
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                ) : debriefTab === 'eventos' ? (
                                     <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-black/20">
                                         <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-3">Registro de eventos (Min:Seg)</p>
                                         {eventLog.length === 0 ? <p className="text-slate-500 italic text-center mt-10">No hay eventos registrados</p> : eventLog.map((l, i) => (
@@ -1394,24 +1493,22 @@
 
         const App = () => {
             const [mode, setMode] = useState('select');
-            const [lang, setLang] = useState(
-                navigator.language.startsWith('es') ? 'es' :
-                (navigator.language.startsWith('pt') ? 'pt' : 'en')
-            );
             const [user, setUser] = useState(null);
             const [sessionId, setSessionId] = useState('');
             const [vitals, setVitals] = useState({ ...DEFAULT_VITALS, ...PATIENT_DEFAULTS.neonatal });
-            // preSessionPatientType: solo usado en pantalla select, antes de tener sesión
+            // Estados pre-sesión: solo usados en pantalla select, antes de crear/unirse a sesión
+            const browserLang = navigator.language.startsWith('es') ? 'es' : (navigator.language.startsWith('pt') ? 'pt' : 'en');
+            const [preSessionLang, setPreSessionLang] = useState(browserLang);
             const [preSessionPatientType, setPreSessionPatientType] = useState('neonatal');
             const [showScanner, setShowScanner] = useState(false);
             const [showGuide, setShowGuide] = useState(false);
             const [sid] = useState(Math.floor(1000 + Math.random() * 9000).toString());
 
-            const t = TRANSLATIONS[lang];
-
-            // FUENTE ÚNICA DE VERDAD: cuando hay sesión, patientType viene de Firestore (vitals).
-            // Esto elimina el stale-closure que causaba comportamiento errático.
+            // FUENTE ÚNICA DE VERDAD: cuando hay sesión, lang y patientType vienen de Firestore.
+            // Sin stale-closures, sin estado duplicado, sin race conditions.
+            const lang = sessionId ? (vitals.lang || preSessionLang) : preSessionLang;
             const patientType = sessionId ? (vitals.patientType || 'neonatal') : preSessionPatientType;
+            const t = TRANSLATIONS[lang];
 
             useEffect(() => {
                 auth.signInAnonymously().then(cred => setUser(cred.user)).catch(() => setUser({ uid: 'guest' }));
@@ -1419,7 +1516,7 @@
                 if (p.get('mode') && p.get('session')) { setMode(p.get('mode')); setSessionId(p.get('session')); }
             }, []);
 
-            // Listener limpio: solo setVitals. patientType se deriva automáticamente de vitals.
+            // Listener limpio: solo setVitals. lang y patientType se derivan automáticamente.
             useEffect(() => {
                 if (!sessionId || !db) return;
                 const unsub = db.collection("sessions").doc(sessionId).onSnapshot(doc => {
@@ -1433,17 +1530,19 @@
                 setVitals(prev => ({ ...prev, hr: defaults.hr, spo2: defaults.spo2, simRunning: false, transition: null }));
             }, [patientType]);
 
-            // Cambiar patientType: actualización optimista local + escritura a Firestore.
-            // La otra pantalla recibe el cambio vía su listener onSnapshot → setVitals.
+            // Handlers: actualización optimista + escritura a Firestore.
+            // La otra pantalla recibe el cambio vía su listener onSnapshot → setVitals → re-render.
             const handlePatientTypeChange = (type) => {
                 if (vitals.simRunning) return;
                 setVitals(prev => ({ ...prev, patientType: type }));
-                if (db && sessionId) {
-                    db.collection("sessions").doc(sessionId).set({ patientType: type }, { merge: true });
-                }
+                if (db && sessionId) db.collection("sessions").doc(sessionId).set({ patientType: type }, { merge: true });
             };
 
-            // Escritura a Firestore unificada para ControllerScreen
+            const handleLangChange = (newLang) => {
+                setVitals(prev => ({ ...prev, lang: newLang }));
+                if (db && sessionId) db.collection("sessions").doc(sessionId).set({ lang: newLang }, { merge: true });
+            };
+
             const handleUpdate = (v) => {
                 if (db && sessionId) db.collection("sessions").doc(sessionId).set(v, { merge: true });
             };
@@ -1457,7 +1556,7 @@
                         {showScanner && <QRScannerView onScan={(s) => { setMode('control'); setSessionId(s); }} onCancel={() => setShowScanner(false)} t={t} />}
 
                         <PatientTypeSelector current={preSessionPatientType} onSelect={setPreSessionPatientType} t={t} />
-                        <LanguageSelector currentLang={lang} onSelect={setLang} />
+                        <LanguageSelector currentLang={preSessionLang} onSelect={setPreSessionLang} />
 
                         <header className="mb-10">
                             <Icons.Activity className="w-16 h-16 text-green-500 mx-auto mb-4 animate-pulse"/>
@@ -1468,7 +1567,7 @@
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
                             <button onClick={() => {
-                                const initDoc = { ...DEFAULT_VITALS, patientType: preSessionPatientType };
+                                const initDoc = { ...DEFAULT_VITALS, patientType: preSessionPatientType, lang: preSessionLang };
                                 setVitals(initDoc);
                                 setSessionId(sid);
                                 setMode('monitor');
@@ -1485,7 +1584,7 @@
             return (
                 <div className="font-sans antialiased">
                     {mode === 'monitor' && <MonitorScreen sessionId={sessionId} vitals={vitals} t={t} patientType={patientType} onPatientTypeChange={handlePatientTypeChange} />}
-                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={handleUpdate} t={t} lang={lang} db={db} userId={user.uid} patientType={patientType} onPatientTypeChange={handlePatientTypeChange} />}
+                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={handleUpdate} t={t} lang={lang} db={db} userId={user.uid} patientType={patientType} onPatientTypeChange={handlePatientTypeChange} onLangChange={handleLangChange} />}
                 </div>
             );
         };
