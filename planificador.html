@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NeoMonitor | Planificador de Escenarios</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<style>
+  body { background:#020617; color:#e2e8f0; font-family:sans-serif; margin:0; }
+  input, textarea { background:#0f172a; border:1px solid #1e293b; color:#e2e8f0; border-radius:10px; padding:10px 14px; width:100%; box-sizing:border-box; font-size:14px; outline:none; font-family:sans-serif; }
+  input:focus, textarea:focus { border-color:#22d3ee; }
+  input::placeholder, textarea::placeholder { color:#334155; }
+  textarea { resize:vertical; }
+  .card { background:#0f1f35; border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:24px; margin-bottom:16px; }
+  .label { font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; display:block; }
+  .btn-primary { background:#22d3ee; color:#020617; font-weight:800; font-size:14px; border:none; border-radius:12px; padding:14px 20px; cursor:pointer; width:100%; }
+  .btn-primary:hover { background:#67e8f9; }
+  .btn-secondary { background:transparent; color:#94a3b8; font-weight:700; font-size:13px; border:1px solid #1e293b; border-radius:12px; padding:12px 20px; cursor:pointer; }
+  .btn-secondary:hover { border-color:#334155; color:#e2e8f0; }
+  .tab { flex:1; padding:10px; border-radius:8px; border:1px solid #1e293b; background:transparent; color:#475569; font-size:12px; font-weight:700; cursor:pointer; text-align:center; transition:all .2s; }
+  .tab.active { background:rgba(34,211,238,0.08); border-color:#22d3ee; color:#22d3ee; }
+  .step-tab { padding:10px 16px; font-size:12px; font-weight:700; border:none; border-bottom:2px solid transparent; background:transparent; color:#475569; cursor:pointer; white-space:nowrap; transition:all .2s; }
+  .step-tab.active { border-color:#22d3ee; color:#22d3ee; }
+  .step-tab.done { color:#94a3b8; }
+  .skill-chip { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; border:1px solid #1e293b; cursor:pointer; font-size:12px; color:#475569; background:transparent; text-align:left; transition:all .15s; }
+  .skill-chip.selected { border-color:rgba(34,211,238,0.5); background:rgba(34,211,238,0.06); color:#22d3ee; }
+  .skill-check { width:16px; height:16px; border-radius:4px; border:1.5px solid currentColor; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; }
+  .skill-chip.selected .skill-check { background:#22d3ee; border-color:#22d3ee; color:#020617; }
+  .vital-box { background:#000; border:1px solid #1e293b; border-radius:16px; padding:16px; text-align:center; }
+  .vital-input { width:100%; background:transparent; border:none; outline:none; text-align:center; font-family:monospace; font-size:44px; font-weight:700; padding:0; }
+  .fc-color { color:#22c55e; }
+  .sat-color { color:#22d3ee; }
+  .gas-section { border:1px solid rgba(255,255,255,0.06); border-radius:12px; overflow:hidden; margin-bottom:12px; }
+  .gas-header { padding:14px 16px; display:flex; align-items:center; gap:12px; }
+  .gas-badge { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; font-family:monospace; }
+  .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px); background:#0a1628; border:1px solid #22d3ee; color:#22d3ee; font-size:13px; font-weight:700; padding:12px 20px; border-radius:12px; opacity:0; transition:all .3s; z-index:999; white-space:nowrap; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-thumb { background:#1e293b; border-radius:2px; }
+  .section { display:none; } .section.active { display:block; }
+  a { text-decoration:none; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div style="background:rgba(10,22,40,0.97);border-bottom:1px solid #1e293b;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100">
+  <a href="index.html" style="color:#475569;font-size:13px;font-weight:700">&larr; Volver</a>
+  <div style="text-align:center">
+    <div style="font-size:13px;font-weight:900;color:white">NeoMonitor</div>
+    <div style="font-size:10px;color:#22d3ee;font-family:monospace;letter-spacing:1px">PLANIFICADOR</div>
+  </div>
+  <div style="font-size:11px;font-family:monospace;color:#475569" id="total-time-hdr">-- min</div>
+</div>
+
+<!-- STEP TABS -->
+<div style="display:flex;overflow-x:auto;background:#0a1628;border-bottom:1px solid #1e293b;padding:0 4px">
+  <button class="step-tab active" onclick="goStep(0)" id="stab-0"><span id="snum-0">1</span> General</button>
+  <button class="step-tab" onclick="goStep(1)" id="stab-1"><span id="snum-1">2</span> Objetivos</button>
+  <button class="step-tab" onclick="goStep(2)" id="stab-2"><span id="snum-2">3</span> Paciente</button>
+  <button class="step-tab" onclick="goStep(3)" id="stab-3"><span id="snum-3">4</span> Escenario</button>
+  <button class="step-tab" onclick="goStep(4)" id="stab-4"><span id="snum-4">5</span> Debriefing</button>
+</div>
+
+<!-- CONTENT -->
+<div style="max-width:680px;margin:0 auto;padding:16px;padding-bottom:100px">
+
+  <!-- STEP 0: General -->
+  <div class="section active" id="sec-0">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:32px;height:32px;background:rgba(34,211,238,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">&#128203;</div>
+        <div><div style="font-size:14px;font-weight:900;color:white">Informacion General</div><div style="font-size:11px;color:#475569">Identificacion del escenario</div></div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label class="label">Titulo del Escenario</label>
+        <input id="f-titulo" type="text" placeholder="Ej: Bradicardia severa en RN de 28 semanas" oninput="updateSidebar()">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:14px">
+        <div>
+          <label class="label">Destinatarios / Nivel de formacion</label>
+          <input id="f-dest" type="text" placeholder="Ej: Residentes de Neonatologia, 2do año">
+        </div>
+        <div>
+          <label class="label">Fecha</label>
+          <input id="f-fecha" type="date" style="width:140px">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div>
+          <label class="label">Pre briefing (min)</label>
+          <input id="f-t1" type="number" placeholder="15" style="text-align:center" oninput="updateTime()">
+        </div>
+        <div>
+          <label class="label">Caso clinico (min)</label>
+          <input id="f-t2" type="number" placeholder="15" style="text-align:center" oninput="updateTime()">
+        </div>
+        <div>
+          <label class="label">Debriefing (min)</label>
+          <input id="f-t3" type="number" placeholder="20" style="text-align:center" oninput="updateTime()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Escenarios guardados -->
+    <div class="card" id="saved-card" style="display:none">
+      <div class="label" style="margin-bottom:12px">Escenarios Guardados</div>
+      <div id="saved-list"></div>
+    </div>
+  </div>
+
+  <!-- STEP 1: Objetivos -->
+  <div class="section" id="sec-1">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:32px;height:32px;background:rgba(245,158,11,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">&#127919;</div>
+        <div><div style="font-size:14px;font-weight:900;color:white">Objetivos de Aprendizaje</div><div style="font-size:11px;color:#475569">Maximo 4 objetivos totales - Plantilla SAP</div></div>
+      </div>
+      <div class="label">Habilidades No Tecnicas</div>
+      <div id="skills-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px"></div>
+      <div class="label">Habilidades Tecnicas</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input id="ht-0" type="text" placeholder="Habilidad tecnica 1...">
+        <input id="ht-1" type="text" placeholder="Habilidad tecnica 2...">
+        <input id="ht-2" type="text" placeholder="Habilidad tecnica 3 (opcional)...">
+        <input id="ht-3" type="text" placeholder="Habilidad tecnica 4 (opcional)...">
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Paciente -->
+  <div class="section" id="sec-2">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:32px;height:32px;background:rgba(239,68,68,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">&#128118;</div>
+        <div><div style="font-size:14px;font-weight:900;color:white">Presentacion del Paciente</div><div style="font-size:11px;color:#475569">Lo que el instructor lee en voz alta al inicio</div></div>
+      </div>
+      <label class="label">Descripcion del caso clinico</label>
+      <textarea id="f-presentacion" rows="6" placeholder="Ej: Recien nacido de 28 semanas de gestacion, producto de parto vaginal en sala de partos. Peso estimado 1.000g. La madre presento rotura prematura de membranas de 24 horas de evolucion. Ingresa a servocuna con llanto debil y esfuerzo respiratorio escaso..."></textarea>
+      <p style="font-size:10px;color:#334155;margin:8px 0 20px">* Desarrolla el caso para el nivel de los participantes y para alcanzar los objetivos del taller.</p>
+      <label class="label">Informacion para el Docente</label>
+      <textarea id="f-docente" rows="4" placeholder="Informacion que el equipo docente debe conocer para mantener validez y confiabilidad del escenario. No se comparte con los participantes. Ej: El simulador responde a VPP efectiva aumentando la FC gradualmente. Si la FC no sube en 30 seg pese a VPP correcta, programar intubacion..."></textarea>
+    </div>
+  </div>
+
+  <!-- STEP 3: Escenario -->
+  <div class="section" id="sec-3">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:32px;height:32px;background:rgba(34,197,94,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">&#9889;</div>
+        <div><div style="font-size:14px;font-weight:900;color:white">Desarrollo del Escenario</div><div style="font-size:11px;color:#475569">Planifica todas las opciones - max. 15 min totales</div></div>
+      </div>
+
+      <!-- Estado tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:20px" id="estado-tabs">
+        <button class="tab active" onclick="selectEstado(0)" id="etab-0">Estado 1</button>
+        <button class="tab" onclick="selectEstado(1)" id="etab-1">Estado 2</button>
+        <button class="tab" onclick="selectEstado(2)" id="etab-2">Estado 3</button>
+        <button class="tab" onclick="selectEstado(3)" id="etab-3">Estado 4</button>
+      </div>
+
+      <!-- FC + SAT -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="vital-box">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#22c55e;margin-bottom:8px">FC</div>
+          <input class="vital-input fc-color" id="e-fc" type="number" placeholder="---" min="0" max="300" oninput="onVitalChange()">
+          <div style="font-size:10px;color:#334155;font-family:monospace;margin-top:4px">lpm</div>
+        </div>
+        <div class="vital-box">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#22d3ee;margin-bottom:8px">SpO2</div>
+          <input class="vital-input sat-color" id="e-sat" type="number" placeholder="---" min="0" max="100" oninput="onVitalChange()">
+          <div style="font-size:10px;color:#334155;font-family:monospace;margin-top:4px">%</div>
+        </div>
+      </div>
+
+      <!-- Boton enviar al monitor -->
+      <button onclick="sendToMonitor()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(34,211,238,0.3);background:rgba(34,211,238,0.04);color:#22d3ee;font-size:11px;font-weight:700;font-family:monospace;letter-spacing:1px;cursor:pointer;margin-bottom:16px">
+        >> Cargar este estado en el Monitor
+      </button>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <label class="label">Tiempo (min)</label>
+          <input id="e-tiempo" type="number" placeholder="Ej: 3" style="text-align:center" oninput="saveCurrentEstado()">
+        </div>
+        <div>
+          <label class="label">Otros signos (referencial)</label>
+          <input id="e-otros" type="text" placeholder="FR, T, TA..." oninput="saveCurrentEstado()">
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label class="label">Respuesta esperada del alumno</label>
+        <textarea id="e-respuesta" rows="3" oninput="saveCurrentEstado()" placeholder="Que se espera que identifique y haga el participante en este estado? Ej: Reconoce bradicardia severa, verifica posicion de la mascara, inicia VPP a 40-60 rpm con FiO2 0.21, evalua expansion toracica bilateral..."></textarea>
+      </div>
+      <div>
+        <label class="label">Cambios en el simulador</label>
+        <input id="e-cambios" type="text" oninput="saveCurrentEstado()" placeholder="Ej: Activar alarma de bradicardia, FC sube a 90 si VPP efectiva...">
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Debriefing -->
+  <div class="section" id="sec-4">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:32px;height:32px;background:rgba(99,102,241,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">&#128172;</div>
+        <div><div style="font-size:14px;font-weight:900;color:white">Debriefing - Metodo GAS</div><div style="font-size:11px;color:#475569">Revisa los objetivos del taller antes de planificar</div></div>
+      </div>
+
+      <!-- G -->
+      <div class="gas-section" style="border-color:rgba(34,211,238,0.15)">
+        <div class="gas-header" style="background:rgba(34,211,238,0.04)">
+          <div class="gas-badge" style="background:rgba(34,211,238,0.1);color:#22d3ee">G</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:white">Gather - Recopilacion</div>
+            <div style="font-size:11px;color:#475569">Como se sintieron? Que paso desde su perspectiva?</div>
+          </div>
+          <input type="number" id="gas-g-time" placeholder="min" style="width:60px;text-align:center;padding:6px 8px;font-size:12px">
+        </div>
+        <div style="padding:0 16px 16px">
+          <textarea id="gas-g-pts" rows="3" placeholder="Puntos destacables para la fase de recopilacion. Ej: Pedir que describan lo que vieron, como reaccionaron, que sintieron. No evaluar ni corregir en esta fase..."></textarea>
+        </div>
+      </div>
+
+      <!-- A -->
+      <div class="gas-section" style="border-color:rgba(245,158,11,0.15)">
+        <div class="gas-header" style="background:rgba(245,158,11,0.04)">
+          <div class="gas-badge" style="background:rgba(245,158,11,0.1);color:#f59e0b">A</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:white">Analyze - Analisis / Reflexion</div>
+            <div style="font-size:11px;color:#475569">Que funciono bien? Que cambiariam? Por que tomaron esas decisiones?</div>
+          </div>
+          <input type="number" id="gas-a-time" placeholder="min" style="width:60px;text-align:center;padding:6px 8px;font-size:12px">
+        </div>
+        <div style="padding:0 16px 16px">
+          <textarea id="gas-a-pts" rows="3" placeholder="Puntos clave para el analisis. Ej: Comunicacion en equipo, distribucion de roles, reconocimiento precoz de la bradicardia, tecnica de VPP, pasos correctivos aplicados..."></textarea>
+        </div>
+      </div>
+
+      <!-- S -->
+      <div class="gas-section" style="border-color:rgba(34,197,94,0.15)">
+        <div class="gas-header" style="background:rgba(34,197,94,0.04)">
+          <div class="gas-badge" style="background:rgba(34,197,94,0.1);color:#22c55e">S</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:white">Summarize - Cierre / Resumen</div>
+            <div style="font-size:11px;color:#475569">Mensajes clave que deben llevarse los participantes</div>
+          </div>
+          <input type="number" id="gas-s-time" placeholder="min" style="width:60px;text-align:center;padding:6px 8px;font-size:12px">
+        </div>
+        <div style="padding:0 16px 16px">
+          <textarea id="gas-s-pts" rows="3" placeholder="Mensajes clave del cierre. Ej: La ventilacion efectiva es la intervencion mas importante. El trabajo en equipo y la comunicacion clara previenen errores. Identificar precozmente la falla de VPP es critico..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end content -->
+
+<!-- FOOTER NAV -->
+<div style="position:fixed;bottom:0;left:0;right:0;background:rgba(10,22,40,0.97);border-top:1px solid #1e293b;padding:12px 16px;display:flex;gap:10px;z-index:100">
+  <button class="btn-secondary" id="btn-back" onclick="prevStep()" style="display:none">&larr; Volver</button>
+  <button class="btn-primary" id="btn-next" onclick="nextStep()">Siguiente &rarr;</button>
+  <div id="footer-final" style="display:none;flex:1;display:none;gap:10px">
+    <button class="btn-secondary" style="flex:1" onclick="saveScenario()">Guardar y Compartir</button>
+    <a href="index.html" class="btn-primary" style="flex:1;text-align:center;display:flex;align-items:center;justify-content:center">Ir al Monitor</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Firebase ───────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyA46SqiHL-U13mdaJnee-KhD372aWc5h2E",
+  authDomain: "monitor-36c41.firebaseapp.com",
+  projectId: "monitor-36c41",
+  storageBucket: "monitor-36c41.firebasestorage.app",
+  messagingSenderId: "830162769122",
+  appId: "1:830162769122:web:1db7060de0c80556db66bb"
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ── State ──────────────────────────────────────────────────────────────────
+let currentStep = 0;
+let currentEstado = 0;
+let selectedSkills = new Set();
+let estados = [
+  {fc:'',sat:'',tiempo:'',otros:'',respuesta:'',cambios:''},
+  {fc:'',sat:'',tiempo:'',otros:'',respuesta:'',cambios:''},
+  {fc:'',sat:'',tiempo:'',otros:'',respuesta:'',cambios:''},
+  {fc:'',sat:'',tiempo:'',otros:'',respuesta:'',cambios:''},
+];
+
+const SKILLS = [
+  'Conocer el ambiente','Anticiparse y planificar','Llamar para pedir ayuda',
+  'Distribucion de roles','Movilizar recursos','Comunicacion efectiva',
+  'Usar informacion disponible','Prevencion de errores','Chequeo doble y cruzado',
+  'Uso de ayuda memorias','Reevaluaciones repetidas','Trabajo en equipo',
+  'Enfocar la atencion','Priorizar dinamicamente','Distribucion de tareas'
+];
+
+// ── Init ───────────────────────────────────────────────────────────────────
+window.onload = function() {
+  document.getElementById('f-fecha').value = new Date().toISOString().split('T')[0];
+  renderSkills();
+  loadSaved();
+  loadEstado(0);
+  updateFooter();
+  // Cargar escenario compartido si viene en UR
