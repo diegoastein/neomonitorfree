@@ -354,11 +354,13 @@
             ChevronDown: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         };
 
-        const DEFAULT_VITALS = { hr: 122, spo2: 91, resp: 45, alarmMuted: false, connected: true, transition: null, soundTimestamp: 0, soundType: null, simRunning: false };
+        const DEFAULT_VITALS = { hr: 122, spo2: 91, resp: 45, alarmMuted: false, connected: true, transition: null, soundTimestamp: 0, soundType: null, simRunning: false, patientType: 'neonatal' };
 
         const CLINICAL_CASES = [
+            // ── NEONATAL ──────────────────────────────────────────────────────
             {
                 id: 'rcp_basica',
+                patientType: 'neonatal',
                 title: { es: 'RCP Neonatal Básica', en: 'Basic Neonatal CPR', pt: 'RCP Neonatal Básica' },
                 presentation: { es: 'RN de 38 sem EG. Parto vaginal prolongado. Nace sin llanto, apneico, hipotonía marcada. Líquido amniótico claro. Equipo de reanimación presente.', en: 'Newborn 38 weeks GA. Prolonged vaginal delivery. Born without cry, apneic, marked hypotonia. Clear amniotic fluid. Resuscitation team present.', pt: 'RN de 38 sem IG. Parto vaginal prolongado. Nasce sem choro, apneico, hipotonia acentuada. Líquido amniótico claro. Equipe de reanimação presente.' },
                 stages: [
@@ -371,6 +373,7 @@
             },
             {
                 id: 'desat_progresiva',
+                patientType: 'neonatal',
                 title: { es: 'Desaturación Progresiva', en: 'Progressive Desaturation', pt: 'Dessaturação Progressiva' },
                 presentation: { es: 'RN de 35 sem EG, parto por cesárea. Dificultad respiratoria progresiva desde el nacimiento. FR 68 rpm, aleteo nasal, tiraje subcostal bilateral. SpO2 88% en aire ambiente.', en: 'Newborn 35 weeks GA, cesarean delivery. Progressive respiratory distress since birth. RR 68 rpm, nasal flaring, subcostal retractions. SpO2 88% on room air.', pt: 'RN de 35 sem IG, parto cesáreo. Dificuldade respiratória progressiva desde o nascimento. FR 68 rpm, batimento de asa de nariz, tiragem subcostal bilateral. SpO2 88% em ar ambiente.' },
                 stages: [
@@ -384,6 +387,7 @@
             },
             {
                 id: 'dificultad_resp',
+                patientType: 'neonatal',
                 title: { es: 'Dificultad Respiratoria', en: 'Respiratory Distress', pt: 'Dificuldade Respiratória' },
                 presentation: { es: 'RN de 36 sem EG. Al minuto de vida presenta quejido espiratorio persistente, FR 74 rpm, tiraje intercostal, cianosis perioral. SpO2 88% en aire ambiente. Sin antecedentes maternos de riesgo.', en: 'Newborn 36 weeks GA. At one minute of life presents persistent expiratory grunt, RR 74 rpm, intercostal retractions, perioral cyanosis. SpO2 88% on room air. No maternal risk factors.', pt: 'RN de 36 sem IG. Ao minuto de vida apresenta gemido expiratório persistente, FR 74 rpm, tiragem intercostal, cianose perioral. SpO2 88% em ar ambiente. Sem antecedentes maternos de risco.' },
                 stages: [
@@ -392,6 +396,85 @@
                     { name: { es: 'Empeoramiento', en: 'Worsening', pt: 'Piora' }, hr: 110, spo2: 76, transition: 10 },
                     { name: { es: 'Respuesta a CPAP/O2', en: 'CPAP/O2 response', pt: 'Resposta a CPAP/O2' }, hr: 138, spo2: 90, transition: 20 },
                     { name: { es: 'Estabilización', en: 'Stabilization', pt: 'Estabilização' }, hr: 152, spo2: 94, transition: 10 },
+                ]
+            },
+            // ── PEDIÁTRICO ────────────────────────────────────────────────────
+            {
+                id: 'shock_septico_ped',
+                patientType: 'pediatrico',
+                title: { es: 'Shock Séptico', en: 'Septic Shock', pt: 'Choque Séptico' },
+                presentation: { es: 'Niño de 4 años. Fiebre de 48 h, decaimiento progresivo. FC 148 lpm, FR 38 rpm, relleno capilar 4 s, piel moteada, PA 72/40 mmHg. SpO2 92% en aire ambiente. Acceso IV colocado.', en: '4-year-old child. 48 h fever, progressive deterioration. HR 148 bpm, RR 38 rpm, capillary refill 4 s, mottled skin, BP 72/40 mmHg. SpO2 92% on room air. IV access established.', pt: 'Criança de 4 anos. Febre de 48 h, deterioração progressiva. FC 148 bpm, FR 38 rpm, enchimento capilar 4 s, pele moteada, PA 72/40 mmHg. SpO2 92% em ar ambiente. Acesso IV estabelecido.' },
+                stages: [
+                    { name: { es: 'Presentación al ingreso', en: 'Admission presentation', pt: 'Apresentação na admissão' }, hr: 148, spo2: 92, transition: 5 },
+                    { name: { es: 'Deterioro hemodinámico', en: 'Hemodynamic deterioration', pt: 'Deterioro hemodinâmico' }, hr: 162, spo2: 88, transition: 15 },
+                    { name: { es: 'Paro cardíaco inminente', en: 'Impending cardiac arrest', pt: 'Parada cardíaca iminente' }, hr: 48, spo2: 72, transition: 10 },
+                    { name: { es: 'Respuesta a volumen + drogas', en: 'Response to fluids + drugs', pt: 'Resposta a volume + drogas' }, hr: 118, spo2: 88, transition: 20 },
+                    { name: { es: 'Estabilización', en: 'Stabilization', pt: 'Estabilização' }, hr: 105, spo2: 96, transition: 15 },
+                ]
+            },
+            {
+                id: 'tsvp_ped',
+                patientType: 'pediatrico',
+                title: { es: 'Taquicardia Supraventricular', en: 'Supraventricular Tachycardia', pt: 'Taquicardia Supraventricular' },
+                presentation: { es: 'Niña de 7 años. Palpitaciones bruscas hace 30 min, palidez y malestar. FC 218 lpm regular, PA 88/60 mmHg, SpO2 96%. Sin cardiopatía conocida. Monitor conectado.', en: '7-year-old girl. Sudden palpitations 30 min ago, pallor and malaise. HR 218 bpm regular, BP 88/60 mmHg, SpO2 96%. No known cardiac disease. Monitor connected.', pt: 'Menina de 7 anos. Palpitações súbitas há 30 min, palidez e mal-estar. FC 218 bpm regular, PA 88/60 mmHg, SpO2 96%. Sem cardiopatia conhecida. Monitor conectado.' },
+                stages: [
+                    { name: { es: 'TSV activa', en: 'Active SVT', pt: 'TSV ativa' }, hr: 218, spo2: 96, transition: 5 },
+                    { name: { es: 'Maniobra vagal / Adenosina', en: 'Vagal maneuver / Adenosine', pt: 'Manobra vagal / Adenosina' }, hr: 218, spo2: 94, transition: 8 },
+                    { name: { es: 'Conversión a ritmo sinusal', en: 'Conversion to sinus rhythm', pt: 'Conversão a ritmo sinusal' }, hr: 105, spo2: 98, transition: 5 },
+                    { name: { es: 'Estabilización', en: 'Stabilization', pt: 'Estabilização' }, hr: 98, spo2: 99, transition: 10 },
+                ]
+            },
+            {
+                id: 'paro_ped',
+                patientType: 'pediatrico',
+                title: { es: 'Paro Cardiorrespiratorio Pediátrico', en: 'Pediatric Cardiac Arrest', pt: 'Parada Cardiorrespiratória Pediátrica' },
+                presentation: { es: 'Niño de 6 años. Encontrado inconsciente luego de accidente en pileta. Sin pulso, sin respiración. Equipo de emergencia presente. RCP iniciado.', en: '6-year-old boy. Found unconscious after pool accident. No pulse, no breathing. Emergency team present. CPR initiated.', pt: 'Menino de 6 anos. Encontrado inconsciente após acidente em piscina. Sem pulso, sem respiração. Equipe de emergência presente. RCP iniciada.' },
+                stages: [
+                    { name: { es: 'Paro / Asistolia', en: 'Arrest / Asystole', pt: 'Parada / Assistolia' }, hr: 0, spo2: 60, transition: 3 },
+                    { name: { es: 'RCP en curso', en: 'CPR in progress', pt: 'RCP em andamento' }, hr: 0, spo2: 65, transition: 10 },
+                    { name: { es: 'FV detectada – DEA', en: 'VF detected – AED', pt: 'FV detectada – DEA' }, hr: 0, spo2: 60, transition: 5 },
+                    { name: { es: 'Post-descarga – AESP', en: 'Post-shock – PEA', pt: 'Pós-choque – AESP' }, hr: 52, spo2: 68, transition: 8 },
+                    { name: { es: 'Retorno circulación espontánea', en: 'Return of spontaneous circulation', pt: 'Retorno da circulação espontânea' }, hr: 88, spo2: 88, transition: 15 },
+                    { name: { es: 'Estabilización post-RCE', en: 'Post-ROSC stabilization', pt: 'Estabilização pós-RCES' }, hr: 100, spo2: 94, transition: 15 },
+                ]
+            },
+            // ── ADULTO ────────────────────────────────────────────────────────
+            {
+                id: 'brady_adulto',
+                patientType: 'adulto',
+                title: { es: 'Bradicardia Sintomática', en: 'Symptomatic Bradycardia', pt: 'Bradicardia Sintomática' },
+                presentation: { es: 'Hombre de 68 años. Síncope transitorio, ahora con mareos y disnea. FC 36 lpm, PA 88/56 mmHg, SpO2 92%. ECG: bloqueo AV completo. Acceso IV colocado.', en: '68-year-old male. Transient syncope, now dizzy and dyspneic. HR 36 bpm, BP 88/56 mmHg, SpO2 92%. ECG: complete AV block. IV access established.', pt: 'Homem de 68 anos. Síncope transitória, agora com tontura e dispneia. FC 36 bpm, PA 88/56 mmHg, SpO2 92%. ECG: bloqueio AV total. Acesso IV estabelecido.' },
+                stages: [
+                    { name: { es: 'Bradicardia severa', en: 'Severe bradycardia', pt: 'Bradicardia grave' }, hr: 36, spo2: 92, transition: 5 },
+                    { name: { es: 'Atropina 0.5 mg IV', en: 'Atropine 0.5 mg IV', pt: 'Atropina 0,5 mg IV' }, hr: 36, spo2: 90, transition: 8 },
+                    { name: { es: 'Respuesta parcial', en: 'Partial response', pt: 'Resposta parcial' }, hr: 50, spo2: 93, transition: 10 },
+                    { name: { es: 'Marcapaso transcutáneo', en: 'Transcutaneous pacing', pt: 'Marca-passo transcutâneo' }, hr: 70, spo2: 95, transition: 8 },
+                    { name: { es: 'Estabilización', en: 'Stabilization', pt: 'Estabilização' }, hr: 72, spo2: 97, transition: 10 },
+                ]
+            },
+            {
+                id: 'tachy_adulto',
+                patientType: 'adulto',
+                title: { es: 'Taquicardia con Inestabilidad', en: 'Unstable Tachycardia', pt: 'Taquicardia com Instabilidade' },
+                presentation: { es: 'Mujer de 55 años. Palpitaciones + dolor precordial. FC 162 lpm irregular, PA 84/52 mmHg, SpO2 93%. ECG: fibrilación auricular rápida. Sin respuesta a maniobras vagales.', en: '55-year-old female. Palpitations + chest pain. HR 162 bpm irregular, BP 84/52 mmHg, SpO2 93%. ECG: rapid atrial fibrillation. No response to vagal maneuvers.', pt: 'Mulher de 55 anos. Palpitações + dor precordial. FC 162 bpm irregular, PA 84/52 mmHg, SpO2 93%. ECG: fibrilação atrial rápida. Sem resposta a manobras vagais.' },
+                stages: [
+                    { name: { es: 'FA rápida inestable', en: 'Unstable rapid AFib', pt: 'FA rápida instável' }, hr: 162, spo2: 93, transition: 5 },
+                    { name: { es: 'Cardioversión sincronizada', en: 'Synchronized cardioversion', pt: 'Cardioversão sincronizada' }, hr: 158, spo2: 92, transition: 5 },
+                    { name: { es: 'Conversión a sinusal', en: 'Conversion to sinus', pt: 'Conversão para sinusal' }, hr: 88, spo2: 96, transition: 8 },
+                    { name: { es: 'Estabilización', en: 'Stabilization', pt: 'Estabilização' }, hr: 80, spo2: 98, transition: 10 },
+                ]
+            },
+            {
+                id: 'paro_adulto',
+                patientType: 'adulto',
+                title: { es: 'Paro Cardiorrespiratorio Adulto', en: 'Adult Cardiac Arrest', pt: 'Parada Cardiorrespiratória Adulto' },
+                presentation: { es: 'Hombre de 60 años. Colapso súbito en sala de espera. Sin pulso, sin respiración. RCP iniciado por primer respondiente. DEA disponible. Equipo ACLS en camino.', en: '60-year-old male. Sudden collapse in waiting room. No pulse, no breathing. CPR initiated by first responder. AED available. ACLS team en route.', pt: 'Homem de 60 anos. Colapso súbito na sala de espera. Sem pulso, sem respiração. RCP iniciada pelo primeiro respondente. DEA disponível. Equipe ACLS a caminho.' },
+                stages: [
+                    { name: { es: 'Paro – FV/TV sin pulso', en: 'Arrest – VF/pulseless VT', pt: 'Parada – FV/TV sem pulso' }, hr: 0, spo2: 60, transition: 3 },
+                    { name: { es: 'RCP de alta calidad', en: 'High-quality CPR', pt: 'RCP de alta qualidade' }, hr: 0, spo2: 65, transition: 10 },
+                    { name: { es: 'Descarga DEA / 200 J', en: 'AED shock / 200 J', pt: 'Choque DEA / 200 J' }, hr: 0, spo2: 62, transition: 5 },
+                    { name: { es: 'RCE – Ritmo sinusal', en: 'ROSC – Sinus rhythm', pt: 'RCES – Ritmo sinusal' }, hr: 68, spo2: 84, transition: 10 },
+                    { name: { es: 'Cuidados post-RCE', en: 'Post-ROSC care', pt: 'Cuidados pós-RCES' }, hr: 76, spo2: 96, transition: 20 },
                 ]
             }
         ];
@@ -602,7 +685,7 @@
                     )}
 
                     {audioEnabled && onPatientTypeChange && (
-                        <PatientTypeSelector current={patientType} onSelect={onPatientTypeChange} t={t} />
+                        <PatientTypeSelector current={patientType} onSelect={onPatientTypeChange} t={t} disabled={vitals.simRunning} />
                     )}
 
                     {audioEnabled && !vitals.simRunning && (
@@ -887,10 +970,13 @@
                                 </span>
                             </div>
                             {onPatientTypeChange && (
-                                <div className="flex rounded-lg overflow-hidden border border-slate-600">
+                                <div className={`flex rounded-lg overflow-hidden border ${currentVitals.simRunning ? 'border-slate-700/40 opacity-50' : 'border-slate-600'}`}
+                                    title={currentVitals.simRunning ? 'Detener la simulación para cambiar tipo de paciente' : ''}>
                                     {['neonatal', 'pediatrico', 'adulto'].map(type => (
-                                        <button key={type} onClick={() => onPatientTypeChange(type)}
-                                            className={`px-3 py-1 text-xs font-bold transition-colors ${patientType === type ? (type === 'neonatal' ? 'bg-green-700 text-white' : type === 'pediatrico' ? 'bg-yellow-700 text-white' : 'bg-blue-700 text-white') : 'bg-slate-900 text-slate-400 hover:bg-slate-700'}`}>
+                                        <button key={type}
+                                            onClick={() => { if (!currentVitals.simRunning) onPatientTypeChange(type); }}
+                                            disabled={currentVitals.simRunning}
+                                            className={`px-3 py-1 text-xs font-bold transition-colors ${currentVitals.simRunning ? 'cursor-not-allowed' : 'cursor-pointer'} ${patientType === type ? (type === 'neonatal' ? 'bg-green-700 text-white' : type === 'pediatrico' ? 'bg-yellow-700 text-white' : 'bg-blue-700 text-white') : 'bg-slate-900 text-slate-400 hover:bg-slate-700'}`}>
                                             {type === 'neonatal' ? 'Neo' : type === 'pediatrico' ? 'Ped' : 'Adult'}
                                         </button>
                                     ))}
@@ -928,8 +1014,8 @@
                                             </div>
                                         </div>
                                     ))}
-                                    {CLINICAL_CASES.length > 0 && <p className="text-xs text-slate-500 uppercase tracking-widest font-bold pt-1">Casos predefinidos</p>}
-                                    {CLINICAL_CASES.map(c => (
+                                    {CLINICAL_CASES.filter(c => c.patientType === patientType).length > 0 && <p className="text-xs text-slate-500 uppercase tracking-widest font-bold pt-1">Casos predefinidos</p>}
+                                    {CLINICAL_CASES.filter(c => c.patientType === patientType).map(c => (
                                         <button key={c.id} onClick={() => { setActiveCase(c); setStageIndex(-1); setShowCaseSelector(false); }}
                                             className="w-full text-left bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-xl p-4 transition-colors active:scale-95">
                                             <div className="font-bold text-white mb-1">{getCaseName(c)}</div>
@@ -1155,14 +1241,17 @@
             </div>
         );
 
-        const PatientTypeSelector = ({ current, onSelect, t }) => {
+        const PatientTypeSelector = ({ current, onSelect, t, disabled = false }) => {
             const types = ['neonatal', 'pediatrico', 'adulto'];
             const labels = { neonatal: 'Neo', pediatrico: 'Ped', adulto: 'Adult' };
             return (
-                <div className="absolute top-6 left-6 z-[80] flex rounded-xl overflow-hidden border border-slate-700 shadow-lg">
+                <div className={`absolute top-6 left-6 z-[80] flex rounded-xl overflow-hidden border shadow-lg ${disabled ? 'border-slate-700/40 opacity-50' : 'border-slate-700'}`}>
                     {types.map(type => (
-                        <button key={type} onClick={() => onSelect(type)}
-                            className={`px-3 py-2 text-xs font-bold transition-colors ${current === type ? 'bg-blue-700 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}`}>
+                        <button key={type}
+                            onClick={() => { if (!disabled) onSelect(type); }}
+                            disabled={disabled}
+                            title={disabled ? 'Detener la simulación para cambiar tipo de paciente' : ''}
+                            className={`px-3 py-2 text-xs font-bold transition-colors ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${current === type ? 'bg-blue-700 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}`}>
                             {labels[type]}
                         </button>
                     ))}
@@ -1218,12 +1307,13 @@
         const App = () => {
             const [mode, setMode] = useState('select');
             const [lang, setLang] = useState(
-                navigator.language.startsWith('es') ? 'es' : 
+                navigator.language.startsWith('es') ? 'es' :
                 (navigator.language.startsWith('pt') ? 'pt' : 'en')
             );
             const [user, setUser] = useState(null);
             const [sessionId, setSessionId] = useState('');
             const [vitals, setVitals] = useState(DEFAULT_VITALS);
+            // patientType local: usado en pantalla select antes de tener sesión
             const [patientType, setPatientType] = useState('neonatal');
             const [showScanner, setShowScanner] = useState(false);
             const [showGuide, setShowGuide] = useState(false);
@@ -1239,9 +1329,32 @@
 
             useEffect(() => {
                 if (!sessionId || !db) return;
-                const unsub = db.collection("sessions").doc(sessionId).onSnapshot(doc => { if (doc.exists) setVitals(doc.data()); });
+                const unsub = db.collection("sessions").doc(sessionId).onSnapshot(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        setVitals(data);
+                        // Sincronizar tipo de paciente desde Firestore (cambio remoto)
+                        if (data.patientType && data.patientType !== patientType) {
+                            setPatientType(data.patientType);
+                        }
+                    }
+                });
                 return () => unsub();
             }, [sessionId]);
+
+            // Cambiar tipo de paciente: actualiza estado local + Firestore; bloqueado durante simulación
+            const handlePatientTypeChange = (type) => {
+                if (vitals.simRunning) return;
+                setPatientType(type);
+                if (db && sessionId) {
+                    db.collection("sessions").doc(sessionId).set({ patientType: type }, { merge: true });
+                }
+            };
+
+            // Escritura a Firestore unificada para ControllerScreen
+            const handleUpdate = (v) => {
+                if (db && sessionId) db.collection("sessions").doc(sessionId).set(v, { merge: true });
+            };
 
             if (!user) return <div className="h-screen bg-black flex flex-col items-center justify-center text-green-500"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mb-4"></div><span className="font-mono text-sm tracking-widest uppercase">{t.connecting}</span></div>;
 
@@ -1262,7 +1375,7 @@
                         </header>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-                            <button onClick={() => { setMode('monitor'); setSessionId(sid); }} className="bg-slate-900 border border-slate-800 hover:border-green-500/50 p-8 rounded-3xl flex flex-col items-center gap-6 group transition-all active:scale-95 shadow-2xl"><div className="bg-green-500/10 p-5 rounded-2xl group-hover:bg-green-500/20 transition-colors"><Icons.Monitor className="w-12 h-12 text-green-400"/></div><span className="text-xl font-bold text-white leading-tight">{t.useAsMonitor}</span></button>
+                            <button onClick={() => { setMode('monitor'); setSessionId(sid); handleUpdate({ ...DEFAULT_VITALS, patientType }); }} className="bg-slate-900 border border-slate-800 hover:border-green-500/50 p-8 rounded-3xl flex flex-col items-center gap-6 group transition-all active:scale-95 shadow-2xl"><div className="bg-green-500/10 p-5 rounded-2xl group-hover:bg-green-500/20 transition-colors"><Icons.Monitor className="w-12 h-12 text-green-400"/></div><span className="text-xl font-bold text-white leading-tight">{t.useAsMonitor}</span></button>
                             <button onClick={() => setShowScanner(true)} className="bg-slate-900 border border-slate-800 hover:border-blue-500/50 p-8 rounded-3xl flex flex-col items-center gap-6 group transition-all active:scale-95 shadow-2xl"><div className="bg-blue-500/10 p-5 rounded-2xl group-hover:bg-blue-500/20 transition-colors"><Icons.Smartphone className="w-12 h-12 text-blue-400"/></div><span className="text-xl font-bold text-white leading-tight">{t.useAsControl}</span></button>
                         </div>
 
@@ -1273,8 +1386,8 @@
 
             return (
                 <div className="font-sans antialiased">
-                    {mode === 'monitor' && <MonitorScreen sessionId={sessionId} vitals={vitals} t={t} patientType={patientType} onPatientTypeChange={setPatientType} />}
-                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={(v) => { if (db && sessionId) db.collection("sessions").doc(sessionId).set(v, { merge: true }); }} t={t} lang={lang} db={db} userId={user.uid} patientType={patientType} onPatientTypeChange={setPatientType} />}
+                    {mode === 'monitor' && <MonitorScreen sessionId={sessionId} vitals={vitals} t={t} patientType={patientType} onPatientTypeChange={handlePatientTypeChange} />}
+                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={handleUpdate} t={t} lang={lang} db={db} userId={user.uid} patientType={patientType} onPatientTypeChange={handlePatientTypeChange} />}
                 </div>
             );
         };
