@@ -796,13 +796,28 @@
 
                     {audioEnabled && !vitals.simRunning && (
                         <div className="absolute inset-0 bg-black z-40 flex flex-col items-center justify-center text-center p-6 border-4 border-slate-800 m-2 rounded-xl">
-                            <Icons.Monitor className="w-12 h-12 text-slate-700 mb-4" />
-                            <h2 className="text-xl font-bold text-slate-500 uppercase tracking-widest mb-4">{t.simNotStarted}</h2>
-                            <div className="bg-white p-3 rounded-lg shadow-lg mb-4">
-                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(controlUrl)}`} alt="Sync" className="w-[180px] h-[180px]" />
-                            </div>
-                            <p className="text-xs text-slate-400 font-mono mb-2">{t.sessionId}: {sessionId}</p>
-                            <p className="text-slate-400 text-sm italic">{t.scanPrompt}</p>
+                            {vitals.controlConnected ? (
+                                <>
+                                    <div className="w-20 h-20 rounded-full bg-green-900/40 border-2 border-green-500 flex items-center justify-center mb-6">
+                                        <svg className="w-10 h-10 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    </div>
+                                    <h2 className="text-2xl font-black text-green-400 uppercase tracking-widest mb-2">Dispositivos sincronizados</h2>
+                                    <p className="text-slate-400 text-base mb-8">Simulación lista para comenzar</p>
+                                    <button onClick={() => setQrExpanded(true)} className="text-xs text-slate-600 hover:text-slate-400 border border-slate-800 px-3 py-1.5 rounded-lg transition-colors">
+                                        Mostrar QR
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Icons.Monitor className="w-12 h-12 text-slate-700 mb-4" />
+                                    <h2 className="text-xl font-bold text-slate-500 uppercase tracking-widest mb-4">{t.simNotStarted}</h2>
+                                    <div className="bg-white p-3 rounded-lg shadow-lg mb-4 cursor-pointer" onClick={() => setQrExpanded(true)}>
+                                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(controlUrl)}`} alt="Sync" className="w-[180px] h-[180px]" />
+                                    </div>
+                                    <p className="text-xs text-slate-400 font-mono mb-2">{t.sessionId}: {sessionId}</p>
+                                    <p className="text-slate-400 text-sm italic">{t.scanPrompt}</p>
+                                </>
+                            )}
                         </div>
                     )}
 
@@ -946,13 +961,16 @@
             const [userCases, setUserCases] = useState([]);
             const [showCaseEditor, setShowCaseEditor] = useState(false);
             const [editingCase, setEditingCase] = useState(null);
-            const [debriefTab, setDebriefTab] = useState('eventos');
+            const [debriefTab, setDebriefTab] = useState('objetivos');
             const [gasNotes, setGasNotes] = useState({ gather: '', analyze: '', summarize: '' });
             const [showPresentation, setShowPresentation] = useState(false);
             const [selectedNTSkills, setSelectedNTSkills] = useState([]);
             const [technicalSkills, setTechnicalSkills] = useState(['', '', '']);
 
             useEffect(() => { setLocalTargets({ hr: currentVitals.hr, spo2: currentVitals.spo2 }); }, [currentVitals.hr, currentVitals.spo2]);
+
+            // Al montarse, señaliza al monitor que el control está conectado
+            useEffect(() => { onUpdate({ controlConnected: true }); }, []);
 
             useEffect(() => {
                 let interval;
@@ -1502,6 +1520,7 @@
             const [preSessionPatientType, setPreSessionPatientType] = useState('neonatal');
             const [showScanner, setShowScanner] = useState(false);
             const [showGuide, setShowGuide] = useState(false);
+            const [vitalsLoaded, setVitalsLoaded] = useState(false);
             const [sid] = useState(Math.floor(1000 + Math.random() * 9000).toString());
 
             // FUENTE ÚNICA DE VERDAD: cuando hay sesión, lang y patientType vienen de Firestore.
@@ -1517,10 +1536,11 @@
             }, []);
 
             // Listener limpio: solo setVitals. lang y patientType se derivan automáticamente.
+            // vitalsLoaded garantiza que control no se renderiza hasta tener datos de Firestore.
             useEffect(() => {
                 if (!sessionId || !db) return;
                 const unsub = db.collection("sessions").doc(sessionId).onSnapshot(doc => {
-                    if (doc.exists) setVitals(doc.data());
+                    if (doc.exists) { setVitals(doc.data()); setVitalsLoaded(true); }
                 });
                 return () => unsub();
             }, [sessionId]);
@@ -1569,6 +1589,7 @@
                             <button onClick={() => {
                                 const initDoc = { ...DEFAULT_VITALS, patientType: preSessionPatientType, lang: preSessionLang };
                                 setVitals(initDoc);
+                                setVitalsLoaded(true);
                                 setSessionId(sid);
                                 setMode('monitor');
                                 if (db) db.collection("sessions").doc(sid).set(initDoc);
@@ -1579,6 +1600,10 @@
                         <div className="mt-12 w-full max-w-md"><SponsorSpace className="h-20 rounded-2xl bg-slate-900/50" source="Menu_Initial" t={t} /><p className="text-[10px] text-slate-600 mt-6 uppercase tracking-widest font-bold">NeoMonitor Simulator</p></div>
                     </div>
                 );
+            }
+
+            if (mode === 'control' && !vitalsLoaded) {
+                return <div className="h-screen bg-black flex flex-col items-center justify-center text-green-500"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mb-4"></div><span className="font-mono text-sm tracking-widest uppercase">{t.connecting}</span></div>;
             }
 
             return (
