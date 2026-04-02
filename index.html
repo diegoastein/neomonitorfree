@@ -334,6 +334,12 @@
             }
         };
 
+        const PATIENT_DEFAULTS = {
+            neonatal:   { hr: 122, spo2: 91 },
+            pediatrico: { hr: 100, spo2: 98 },
+            adulto:     { hr: 75,  spo2: 98 },
+        };
+
         const Icons = {
             Activity: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
             Monitor: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>,
@@ -476,7 +482,107 @@
                     { name: { es: 'RCE – Ritmo sinusal', en: 'ROSC – Sinus rhythm', pt: 'RCES – Ritmo sinusal' }, hr: 68, spo2: 84, transition: 10 },
                     { name: { es: 'Cuidados post-RCE', en: 'Post-ROSC care', pt: 'Cuidados pós-RCES' }, hr: 76, spo2: 96, transition: 20 },
                 ]
-            }
+            },
+            // ── PEDIÁTRICO (adicionales) ──────────────────────────────────────
+            {
+                id: 'tsv_pediatrica',
+                patientType: 'pediatrico',
+                title: { es: 'Taquicardia Supraventricular (TSV)', en: 'Supraventricular Tachycardia (SVT)', pt: 'Taquicardia Supraventricular (TSV)' },
+                presentation: { es: 'Lactante de 4 meses. Irritable, pálido, rechazo del alimento. FC 215 lpm en ECG. Sin fiebre. Sin antecedentes previos.', en: '4-month-old infant. Irritable, pale, feeding refusal. HR 215 bpm on ECG. No fever. No prior history.', pt: 'Lactente de 4 meses. Irritável, pálido, recusa alimentar. FC 215 bpm no ECG. Sem febre. Sem antecedentes.' },
+                stages: [
+                    { name: { es: 'Estado basal', en: 'Baseline', pt: 'Estado basal' }, hr: 100, spo2: 98, transition: 5 },
+                    { name: { es: 'Inicio TSV', en: 'SVT onset', pt: 'Início TSV' }, hr: 215, spo2: 94, transition: 10 },
+                    { name: { es: 'Deterioro hemodinámico', en: 'Hemodynamic deterioration', pt: 'Deterioro hemodinâmico' }, hr: 215, spo2: 88, transition: 15 },
+                    { name: { es: 'Post-cardioversión', en: 'Post-cardioversion', pt: 'Pós-cardioversão' }, hr: 95, spo2: 97, transition: 20 },
+                    { name: { es: 'Estabilización', en: 'Stabilization', pt: 'Estabilização' }, hr: 100, spo2: 98, transition: 10 },
+                ]
+            },
+            {
+                id: 'shock_septico_ped2',
+                patientType: 'pediatrico',
+                title: { es: 'Shock Séptico Descompensado', en: 'Decompensated Septic Shock', pt: 'Choque Séptico Descompensado' },
+                presentation: { es: 'Niño de 6 años. Fiebre de 3 días. Llega con llenado capilar >5 seg, hipotensión, alteración del sensorio. Foco pulmonar probable.', en: '6-year-old child. 3 days of fever. Presents with capillary refill >5 sec, hypotension, altered consciousness. Probable pulmonary focus.', pt: 'Criança de 6 anos. Febre há 3 dias. Chega com TEC >5 seg, hipotensão, alteração do sensório. Foco pulmonar provável.' },
+                stages: [
+                    { name: { es: 'Shock compensado', en: 'Compensated shock', pt: 'Choque compensado' }, hr: 148, spo2: 93, transition: 5 },
+                    { name: { es: 'Shock descompensado', en: 'Decompensated shock', pt: 'Choque descompensado' }, hr: 155, spo2: 88, transition: 15 },
+                    { name: { es: 'Paro inminente', en: 'Impending arrest', pt: 'Parada iminente' }, hr: 58, spo2: 78, transition: 10 },
+                    { name: { es: 'RCP', en: 'CPR', pt: 'RCP' }, hr: 0, spo2: 60, transition: 5 },
+                    { name: { es: 'Respuesta a RCP', en: 'CPR response', pt: 'Resposta à RCP' }, hr: 80, spo2: 88, transition: 30 },
+                    { name: { es: 'Estabilización', en: 'Stabilization', pt: 'Estabilização' }, hr: 105, spo2: 95, transition: 20 },
+                ]
+            },
+            {
+                id: 'brady_ped',
+                patientType: 'pediatrico',
+                title: { es: 'Bradicardia con Mala Perfusión', en: 'Bradycardia with Poor Perfusion', pt: 'Bradicardia com Má Perfusão' },
+                presentation: { es: 'Escolar de 8 años. Postcirugía cardíaca. Monitorizado en UCI pediátrica. Letárgico, pulso débil, mala perfusión periférica.', en: '8-year-old. Post-cardiac surgery. Monitored in PICU. Lethargic, weak pulse, poor peripheral perfusion.', pt: 'Escolar de 8 anos. Pós-cirurgia cardíaca. Monitorado em UTI pediátrica. Letárgico, pulso fraco, má perfusão periférica.' },
+                stages: [
+                    { name: { es: 'Estado basal', en: 'Baseline', pt: 'Estado basal' }, hr: 80, spo2: 96, transition: 5 },
+                    { name: { es: 'Bradicardia leve', en: 'Mild bradycardia', pt: 'Bradicardia leve' }, hr: 62, spo2: 93, transition: 20 },
+                    { name: { es: 'Bradicardia severa', en: 'Severe bradycardia', pt: 'Bradicardia grave' }, hr: 48, spo2: 88, transition: 15 },
+                    { name: { es: 'RCP', en: 'CPR', pt: 'RCP' }, hr: 0, spo2: 65, transition: 5 },
+                    { name: { es: 'Respuesta', en: 'Response', pt: 'Resposta' }, hr: 72, spo2: 92, transition: 25 },
+                    { name: { es: 'Normalización', en: 'Normalization', pt: 'Normalização' }, hr: 85, spo2: 97, transition: 15 },
+                ]
+            },
+            // ── ADULTO (adicionales) ──────────────────────────────────────────
+            {
+                id: 'bradycardia_adulto',
+                patientType: 'adulto',
+                title: { es: 'Bradicardia Sintomática', en: 'Symptomatic Bradycardia', pt: 'Bradicardia Sintomática' },
+                presentation: { es: 'Hombre de 68 años. Mareos, síncope de esfuerzo. PA 88/60. FC 34 lpm. Bloqueo AV completo en ECG. Sin dolor precordial.', en: '68-year-old male. Dizziness, exertional syncope. BP 88/60. HR 34 bpm. Complete AV block on ECG. No chest pain.', pt: 'Homem de 68 anos. Tontura, síncope de esforço. PA 88/60. FC 34 bpm. Bloqueio AV completo no ECG. Sem dor precordial.' },
+                stages: [
+                    { name: { es: 'Sintomático', en: 'Symptomatic', pt: 'Sintomático' }, hr: 34, spo2: 94, transition: 5 },
+                    { name: { es: 'Post-atropina', en: 'Post-atropine', pt: 'Pós-atropina' }, hr: 52, spo2: 95, transition: 15 },
+                    { name: { es: 'Respuesta parcial', en: 'Partial response', pt: 'Resposta parcial' }, hr: 46, spo2: 94, transition: 20 },
+                    { name: { es: 'Marcapasos transitorio', en: 'Transient pacemaker', pt: 'Marca-passo transitório' }, hr: 70, spo2: 96, transition: 10 },
+                    { name: { es: 'Estabilización', en: 'Stabilization', pt: 'Estabilização' }, hr: 72, spo2: 97, transition: 10 },
+                ]
+            },
+            {
+                id: 'taquicardia_ventricular',
+                patientType: 'adulto',
+                title: { es: 'Taquicardia Ventricular con Pulso', en: 'Ventricular Tachycardia with Pulse', pt: 'Taquicardia Ventricular com Pulso' },
+                presentation: { es: 'Mujer de 55 años. Palpitaciones y disnea de inicio súbito. PA 90/60. FC 165 lpm, QRS ancho en ECG. Antecedente de IAM hace 2 años.', en: '55-year-old female. Sudden palpitations and dyspnea. BP 90/60. HR 165 bpm, wide QRS on ECG. History of MI 2 years ago.', pt: 'Mulher de 55 anos. Palpitações e dispneia de início súbito. PA 90/60. FC 165 bpm, QRS largo no ECG. Antecedente de IAM há 2 anos.' },
+                stages: [
+                    { name: { es: 'TV estable', en: 'Stable VT', pt: 'TV estável' }, hr: 165, spo2: 95, transition: 5 },
+                    { name: { es: 'Deterioro hemodinámico', en: 'Hemodynamic deterioration', pt: 'Deterioro hemodinâmico' }, hr: 168, spo2: 90, transition: 15 },
+                    { name: { es: 'TV inestable', en: 'Unstable VT', pt: 'TV instável' }, hr: 172, spo2: 84, transition: 10 },
+                    { name: { es: 'Post-cardioversión', en: 'Post-cardioversion', pt: 'Pós-cardioversão' }, hr: 88, spo2: 96, transition: 20 },
+                    { name: { es: 'Estabilización', en: 'Stabilization', pt: 'Estabilização' }, hr: 78, spo2: 97, transition: 10 },
+                ]
+            },
+            {
+                id: 'pcr_adulto',
+                patientType: 'adulto',
+                title: { es: 'Paro Cardiorrespiratorio (PCR)', en: 'Cardiopulmonary Arrest (CPA)', pt: 'Parada Cardiorrespiratória (PCR)' },
+                presentation: { es: 'Hombre de 62 años. Colapso súbito en vía pública. Sin pulso, apneico. RCP iniciada por testigos. DEA disponible. Sin antecedentes conocidos.', en: '62-year-old male. Sudden collapse in public. Pulseless, apneic. Bystander CPR initiated. AED available. No known history.', pt: 'Homem de 62 anos. Colapso súbito em via pública. Sem pulso, apneico. RCP iniciada por testemunhas. DEA disponível. Sem antecedentes conhecidos.' },
+                stages: [
+                    { name: { es: 'Colapso / PCR', en: 'Collapse / CPA', pt: 'Colapso / PCR' }, hr: 0, spo2: 60, transition: 5 },
+                    { name: { es: 'RCP en curso', en: 'CPR in progress', pt: 'RCP em andamento' }, hr: 0, spo2: 65, transition: 30 },
+                    { name: { es: 'Post-desfibrilación', en: 'Post-defibrillation', pt: 'Pós-desfibrilação' }, hr: 42, spo2: 78, transition: 15 },
+                    { name: { es: 'Recuperación', en: 'Recovery', pt: 'Recuperação' }, hr: 88, spo2: 90, transition: 20 },
+                    { name: { es: 'Estabilización', en: 'Stabilization', pt: 'Estabilização' }, hr: 80, spo2: 96, transition: 15 },
+                ]
+            },
+        ];
+
+        const NON_TECHNICAL_SKILLS = [
+            'Conocer el ambiente',
+            'Anticiparse y planificar',
+            'Llamar para pedir ayuda',
+            'Distribución de roles',
+            'Movilizar los recursos disponibles',
+            'Comunicación efectiva',
+            'Usar la información disponible',
+            'Prevención y fijación de errores',
+            'Chequeo doble y cruzado',
+            'Uso de ayuda memorias',
+            'Reevaluaciones repetidas',
+            'Trabajo en equipo',
+            'Enfocar la atención con sabiduría',
+            'Priorizar dinámicamente',
+            'Distribución de tareas',
         ];
 
         const SponsorSpace = ({ className = "", compact = false, source = "Monitor", t }) => (
@@ -690,13 +796,28 @@
 
                     {audioEnabled && !vitals.simRunning && (
                         <div className="absolute inset-0 bg-black z-40 flex flex-col items-center justify-center text-center p-6 border-4 border-slate-800 m-2 rounded-xl">
-                            <Icons.Monitor className="w-12 h-12 text-slate-700 mb-4" />
-                            <h2 className="text-xl font-bold text-slate-500 uppercase tracking-widest mb-4">{t.simNotStarted}</h2>
-                            <div className="bg-white p-3 rounded-lg shadow-lg mb-4">
-                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(controlUrl)}`} alt="Sync" className="w-[180px] h-[180px]" />
-                            </div>
-                            <p className="text-xs text-slate-400 font-mono mb-2">{t.sessionId}: {sessionId}</p>
-                            <p className="text-slate-400 text-sm italic">{t.scanPrompt}</p>
+                            {vitals.controlConnected ? (
+                                <>
+                                    <div className="w-20 h-20 rounded-full bg-green-900/40 border-2 border-green-500 flex items-center justify-center mb-6">
+                                        <svg className="w-10 h-10 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    </div>
+                                    <h2 className="text-2xl font-black text-green-400 uppercase tracking-widest mb-2">Dispositivos sincronizados</h2>
+                                    <p className="text-slate-400 text-base mb-8">Simulación lista para comenzar</p>
+                                    <button onClick={() => setQrExpanded(true)} className="text-xs text-slate-600 hover:text-slate-400 border border-slate-800 px-3 py-1.5 rounded-lg transition-colors">
+                                        Mostrar QR
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Icons.Monitor className="w-12 h-12 text-slate-700 mb-4" />
+                                    <h2 className="text-xl font-bold text-slate-500 uppercase tracking-widest mb-4">{t.simNotStarted}</h2>
+                                    <div className="bg-white p-3 rounded-lg shadow-lg mb-4 cursor-pointer" onClick={() => setQrExpanded(true)}>
+                                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(controlUrl)}`} alt="Sync" className="w-[180px] h-[180px]" />
+                                    </div>
+                                    <p className="text-xs text-slate-400 font-mono mb-2">{t.sessionId}: {sessionId}</p>
+                                    <p className="text-slate-400 text-sm italic">{t.scanPrompt}</p>
+                                </>
+                            )}
                         </div>
                     )}
 
@@ -826,7 +947,7 @@
             );
         };
 
-        const ControllerScreen = ({ sessionId, vitals: currentVitals, onUpdate, t, lang, db, userId, patientType = 'neonatal', onPatientTypeChange }) => {
+        const ControllerScreen = ({ sessionId, vitals: currentVitals, onUpdate, t, lang, db, userId, patientType = 'neonatal', onPatientTypeChange, onLangChange }) => {
             const vitals = useInterpolatedVitals(currentVitals);
             const [transitionDuration, setTransitionDuration] = useState(5);
             const [showDebrief, setShowDebrief] = useState(false);
@@ -840,11 +961,16 @@
             const [userCases, setUserCases] = useState([]);
             const [showCaseEditor, setShowCaseEditor] = useState(false);
             const [editingCase, setEditingCase] = useState(null);
-            const [debriefTab, setDebriefTab] = useState('eventos');
+            const [debriefTab, setDebriefTab] = useState('objetivos');
             const [gasNotes, setGasNotes] = useState({ gather: '', analyze: '', summarize: '' });
             const [showPresentation, setShowPresentation] = useState(false);
+            const [selectedNTSkills, setSelectedNTSkills] = useState([]);
+            const [technicalSkills, setTechnicalSkills] = useState(['', '', '']);
 
             useEffect(() => { setLocalTargets({ hr: currentVitals.hr, spo2: currentVitals.spo2 }); }, [currentVitals.hr, currentVitals.spo2]);
+
+            // Al montarse, señaliza al monitor que el control está conectado
+            useEffect(() => { onUpdate({ controlConnected: true }); }, []);
 
             useEffect(() => {
                 let interval;
@@ -953,22 +1079,13 @@
 
             return (
                 <div className="h-screen overflow-y-auto bg-slate-900 text-white flex flex-col">
-                    <header className="flex-none flex flex-col bg-slate-800">
-                        <div className="flex justify-between items-center px-4 pt-3 pb-2">
-                            <div className="flex items-center gap-2">
-                                <h2 className="font-bold text-blue-400 flex items-center gap-2"><Icons.Smartphone className="w-4 h-4"/> {t.control}</h2>
-                                {currentVitals.simRunning && <span className="ml-2 px-2 py-0.5 bg-red-900/50 text-red-400 text-xs rounded border border-red-500 font-mono animate-pulse">{displayTime}</span>}
-                                <button onClick={() => setShowDebrief(true)} className="ml-4 bg-slate-700 text-xs px-2 py-1 rounded flex items-center gap-1"><Icons.List className="w-3 h-3"/> {t.debriefing}</button>
-                            </div>
-                            <span className="text-sm font-mono border border-slate-600 px-2 py-0.5 rounded">ID: {sessionId}</span>
+                    <header className="flex-none flex items-center justify-between px-4 py-3 bg-slate-800 gap-2 flex-wrap">
+                        <div className="flex items-center gap-2">
+                            <h2 className="font-bold text-blue-400 flex items-center gap-2"><Icons.Smartphone className="w-4 h-4"/> {t.control}</h2>
+                            {currentVitals.simRunning && <span className="px-2 py-0.5 bg-red-900/50 text-red-400 text-xs rounded border border-red-500 font-mono animate-pulse">{displayTime}</span>}
+                            <button onClick={() => setShowDebrief(true)} className="bg-slate-700 text-xs px-2 py-1 rounded flex items-center gap-1"><Icons.List className="w-3 h-3"/> {t.debriefing}</button>
                         </div>
-                        <div className="flex items-center justify-between px-4 pb-3 border-t border-slate-700/50 pt-2">
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">Paciente:</span>
-                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${patientType === 'neonatal' ? 'bg-green-900/60 text-green-300 border border-green-600/50' : patientType === 'pediatrico' ? 'bg-yellow-900/60 text-yellow-300 border border-yellow-600/50' : 'bg-blue-900/60 text-blue-300 border border-blue-600/50'}`}>
-                                    {t.patientTypes ? t.patientTypes[patientType].toUpperCase() : patientType.toUpperCase()}
-                                </span>
-                            </div>
+                        <div className="flex items-center gap-2">
                             {onPatientTypeChange && (
                                 <div className={`flex rounded-lg overflow-hidden border ${currentVitals.simRunning ? 'border-slate-700/40 opacity-50' : 'border-slate-600'}`}
                                     title={currentVitals.simRunning ? 'Detener la simulación para cambiar tipo de paciente' : ''}>
@@ -982,6 +1099,17 @@
                                     ))}
                                 </div>
                             )}
+                            {onLangChange && (
+                                <div className="flex rounded-lg overflow-hidden border border-slate-600">
+                                    {['es','en','pt'].map(l => (
+                                        <button key={l} onClick={() => onLangChange(l)}
+                                            className={`px-2 py-1 text-xs font-bold uppercase transition-colors ${lang === l ? 'bg-slate-500 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-700'}`}>
+                                            {l}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                            <span className="text-xs font-mono border border-slate-600 px-2 py-0.5 rounded text-slate-400">ID: {sessionId}</span>
                         </div>
                     </header>
 
@@ -995,13 +1123,13 @@
                                     <button onClick={() => setShowCaseSelector(false)}><Icons.X className="w-6 h-6"/></button>
                                 </div>
                                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                                    <button onClick={() => { setEditingCase({ title: '', stages: [{ name: '', hr: 120, spo2: 92, transition: 10 }] }); setShowCaseEditor(true); setShowCaseSelector(false); }}
+                                    <button onClick={() => { setEditingCase({ title: '', stages: [{ name: '', hr: 120, spo2: 92, transition: 10 }], patientType }); setShowCaseEditor(true); setShowCaseSelector(false); }}
                                         className="w-full text-left bg-green-900/30 hover:bg-green-900/50 border border-green-500/40 rounded-xl p-4 transition-colors active:scale-95 flex items-center gap-3">
                                         <div className="w-8 h-8 bg-green-700/50 rounded-full flex items-center justify-center text-green-300 font-bold text-xl flex-none">+</div>
                                         <span className="font-bold text-green-300">Nuevo caso</span>
                                     </button>
-                                    {userCases.length > 0 && <p className="text-xs text-slate-500 uppercase tracking-widest font-bold pt-1">Mis casos</p>}
-                                    {userCases.map(c => (
+                                    {userCases.filter(c => !c.patientType || c.patientType === patientType).length > 0 && <p className="text-xs text-slate-500 uppercase tracking-widest font-bold pt-1">Mis casos</p>}
+                                    {userCases.filter(c => !c.patientType || c.patientType === patientType).map(c => (
                                         <div key={c.id} className="flex gap-2">
                                             <button onClick={() => { setActiveCase(c); setStageIndex(-1); setShowCaseSelector(false); }}
                                                 className="flex-1 text-left bg-indigo-900/30 hover:bg-indigo-900/50 border border-indigo-500/40 rounded-xl p-4 transition-colors active:scale-95">
@@ -1035,10 +1163,77 @@
                                     <button onClick={() => setShowDebrief(false)}><Icons.X className="w-6 h-6"/></button>
                                 </div>
                                 <div className="flex border-b border-slate-700 flex-none">
+                                    <button onClick={() => setDebriefTab('objetivos')} className={`flex-1 py-2 text-sm font-bold transition-colors ${debriefTab === 'objetivos' ? 'bg-slate-700 text-white border-b-2 border-purple-400' : 'text-slate-400 hover:bg-slate-700/50'}`}>Objetivos</button>
                                     <button onClick={() => setDebriefTab('eventos')} className={`flex-1 py-2 text-sm font-bold transition-colors ${debriefTab === 'eventos' ? 'bg-slate-700 text-white border-b-2 border-blue-400' : 'text-slate-400 hover:bg-slate-700/50'}`}>Eventos</button>
                                     <button onClick={() => setDebriefTab('gas')} className={`flex-1 py-2 text-sm font-bold transition-colors ${debriefTab === 'gas' ? 'bg-slate-700 text-white border-b-2 border-amber-400' : 'text-slate-400 hover:bg-slate-700/50'}`}>GAS</button>
                                 </div>
-                                {debriefTab === 'eventos' ? (
+                                {debriefTab === 'objetivos' ? (
+                                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/20">
+                                        {(() => {
+                                            const totalSelected = selectedNTSkills.length + technicalSkills.filter(s => s.trim()).length;
+                                            const toggleNT = (skill) => {
+                                                if (selectedNTSkills.includes(skill)) {
+                                                    setSelectedNTSkills(prev => prev.filter(s => s !== skill));
+                                                } else {
+                                                    if (totalSelected >= 4) return;
+                                                    setSelectedNTSkills(prev => [...prev, skill]);
+                                                }
+                                            };
+                                            return (
+                                                <>
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <p className="text-xs text-slate-400 uppercase tracking-widest font-bold">Habilidades no técnicas</p>
+                                                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${totalSelected >= 4 ? 'bg-red-900/60 text-red-300' : 'bg-slate-700 text-slate-300'}`}>{totalSelected}/4 obj.</span>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 gap-1.5">
+                                                        {NON_TECHNICAL_SKILLS.map(skill => {
+                                                            const active = selectedNTSkills.includes(skill);
+                                                            const disabled = !active && totalSelected >= 4;
+                                                            return (
+                                                                <button key={skill} onClick={() => toggleNT(skill)}
+                                                                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 ${active ? 'bg-purple-800/60 border border-purple-500/60 text-purple-200' : disabled ? 'bg-slate-800/30 text-slate-600 cursor-not-allowed' : 'bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60'}`}>
+                                                                    <span className={`w-4 h-4 rounded border flex-none flex items-center justify-center ${active ? 'bg-purple-500 border-purple-400' : 'border-slate-600'}`}>
+                                                                        {active && <span className="text-white text-[10px] font-black">✓</span>}
+                                                                    </span>
+                                                                    {skill}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                    <div className="mt-3">
+                                                        <p className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-2">Habilidades técnicas</p>
+                                                        <div className="space-y-2">
+                                                            {technicalSkills.map((skill, i) => {
+                                                                const canAdd = skill.trim() || totalSelected < 4 || technicalSkills.filter(s => s.trim()).includes(skill);
+                                                                return (
+                                                                    <input key={i} type="text" value={skill}
+                                                                        onChange={e => {
+                                                                            const newVal = e.target.value;
+                                                                            const newList = [...technicalSkills];
+                                                                            newList[i] = newVal;
+                                                                            const newTotal = selectedNTSkills.length + newList.filter(s => s.trim()).length;
+                                                                            if (newVal.trim() && !skill.trim() && newTotal > 4) return;
+                                                                            setTechnicalSkills(newList);
+                                                                        }}
+                                                                        placeholder={`Habilidad técnica ${i + 1}…`}
+                                                                        className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-xs outline-none focus:border-purple-500 placeholder-slate-500"
+                                                                    />
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                    {(selectedNTSkills.length > 0 || technicalSkills.some(s => s.trim())) && (
+                                                        <div className="mt-3 bg-purple-900/20 border border-purple-500/30 rounded-xl p-3">
+                                                            <p className="text-xs text-purple-300 font-bold uppercase tracking-widest mb-2">Objetivos seleccionados</p>
+                                                            {selectedNTSkills.map(s => <p key={s} className="text-xs text-white flex gap-2 mb-1"><span className="text-purple-400">▸</span>{s}</p>)}
+                                                            {technicalSkills.filter(s => s.trim()).map((s, i) => <p key={i} className="text-xs text-white flex gap-2 mb-1"><span className="text-purple-400">▸</span>{s}</p>)}
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                ) : debriefTab === 'eventos' ? (
                                     <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-black/20">
                                         <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-3">Registro de eventos (Min:Seg)</p>
                                         {eventLog.length === 0 ? <p className="text-slate-500 italic text-center mt-10">No hay eventos registrados</p> : eventLog.map((l, i) => (
@@ -1046,36 +1241,22 @@
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/20">
-                                        <div className="bg-slate-700/30 rounded-xl p-3 border border-slate-600">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="w-7 h-7 bg-blue-700 rounded-full flex items-center justify-center text-xs font-black text-white flex-none">G</span>
-                                                <span className="font-bold text-blue-300 text-sm">Gather — Recopilación</span>
-                                            </div>
-                                            {eventLog.length > 0 && (
-                                                <div className="space-y-1 mb-2 max-h-28 overflow-y-auto">
-                                                    {eventLog.map((l, i) => <div key={i} className="text-xs text-slate-300 flex gap-2"><span className="text-slate-500 font-mono w-12 flex-none">[{l.time}]</span>{l.msg}</div>)}
+                                    <div className="flex-1 flex flex-col p-3 gap-3 bg-black/20 min-h-0">
+                                        {[
+                                            { key: 'gather', label: 'Gather — Recopilación', letter: 'G', color: 'blue', placeholder: '¿Qué observaron? ¿Qué ocurrió durante el caso?', border: 'focus:border-blue-500', ring: 'bg-blue-700', text: 'text-blue-300' },
+                                            { key: 'analyze', label: 'Analyze — Análisis/Reflexión', letter: 'A', color: 'amber', placeholder: '¿Por qué ocurrió? ¿Qué salió bien y qué mejorar?', border: 'focus:border-amber-500', ring: 'bg-amber-700', text: 'text-amber-300' },
+                                            { key: 'summarize', label: 'Summarize — Cierre/Resumen', letter: 'S', color: 'green', placeholder: 'Mensajes clave para llevar. ¿Qué aprendimos?', border: 'focus:border-green-500', ring: 'bg-green-700', text: 'text-green-300' },
+                                        ].map(({ key, label, letter, placeholder, border, ring, text }) => (
+                                            <div key={key} className="flex-1 flex flex-col bg-slate-700/30 rounded-xl border border-slate-600 overflow-hidden min-h-0">
+                                                <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-600/50 flex-none">
+                                                    <span className={`w-6 h-6 ${ring} rounded-full flex items-center justify-center text-xs font-black text-white flex-none`}>{letter}</span>
+                                                    <span className={`font-bold ${text} text-xs`}>{label}</span>
                                                 </div>
-                                            )}
-                                            <textarea value={gasNotes.gather} onChange={e => setGasNotes(p => ({ ...p, gather: e.target.value }))} placeholder="¿Qué observaron? ¿Qué ocurrió durante el caso?"
-                                                className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white text-xs outline-none focus:border-blue-500 resize-none" rows={3}/>
-                                        </div>
-                                        <div className="bg-slate-700/30 rounded-xl p-3 border border-slate-600">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="w-7 h-7 bg-amber-700 rounded-full flex items-center justify-center text-xs font-black text-white flex-none">A</span>
-                                                <span className="font-bold text-amber-300 text-sm">Analyze — Análisis/Reflexión</span>
+                                                <textarea value={gasNotes[key]} onChange={e => setGasNotes(p => ({ ...p, [key]: e.target.value }))}
+                                                    placeholder={placeholder}
+                                                    className={`flex-1 w-full bg-transparent p-3 text-white text-sm outline-none ${border} resize-none placeholder-slate-600`}/>
                                             </div>
-                                            <textarea value={gasNotes.analyze} onChange={e => setGasNotes(p => ({ ...p, analyze: e.target.value }))} placeholder="¿Por qué ocurrió? ¿Qué salió bien y qué mejorar?"
-                                                className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white text-xs outline-none focus:border-amber-500 resize-none" rows={4}/>
-                                        </div>
-                                        <div className="bg-slate-700/30 rounded-xl p-3 border border-slate-600">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="w-7 h-7 bg-green-700 rounded-full flex items-center justify-center text-xs font-black text-white flex-none">S</span>
-                                                <span className="font-bold text-green-300 text-sm">Summarize — Cierre/Resumen</span>
-                                            </div>
-                                            <textarea value={gasNotes.summarize} onChange={e => setGasNotes(p => ({ ...p, summarize: e.target.value }))} placeholder="Mensajes clave para llevar. ¿Qué aprendimos?"
-                                                className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white text-xs outline-none focus:border-green-500 resize-none" rows={4}/>
-                                        </div>
+                                        ))}
                                     </div>
                                 )}
                             </div>
@@ -1306,24 +1487,23 @@
 
         const App = () => {
             const [mode, setMode] = useState('select');
-            const [lang, setLang] = useState(
-                navigator.language.startsWith('es') ? 'es' :
-                (navigator.language.startsWith('pt') ? 'pt' : 'en')
-            );
             const [user, setUser] = useState(null);
             const [sessionId, setSessionId] = useState('');
-            const [vitals, setVitals] = useState(DEFAULT_VITALS);
-            // preSessionPatientType: solo usado en pantalla select, antes de tener sesión
+            const [vitals, setVitals] = useState({ ...DEFAULT_VITALS, ...PATIENT_DEFAULTS.neonatal });
+            // Estados pre-sesión: solo usados en pantalla select, antes de crear/unirse a sesión
+            const browserLang = navigator.language.startsWith('es') ? 'es' : (navigator.language.startsWith('pt') ? 'pt' : 'en');
+            const [preSessionLang, setPreSessionLang] = useState(browserLang);
             const [preSessionPatientType, setPreSessionPatientType] = useState('neonatal');
             const [showScanner, setShowScanner] = useState(false);
             const [showGuide, setShowGuide] = useState(false);
+            const [vitalsLoaded, setVitalsLoaded] = useState(false);
             const [sid] = useState(Math.floor(1000 + Math.random() * 9000).toString());
 
-            const t = TRANSLATIONS[lang];
-
-            // FUENTE ÚNICA DE VERDAD: cuando hay sesión, patientType viene de Firestore (vitals).
-            // Esto elimina el stale-closure que causaba comportamiento errático.
+            // FUENTE ÚNICA DE VERDAD: cuando hay sesión, lang y patientType vienen de Firestore.
+            // Sin stale-closures, sin estado duplicado, sin race conditions.
+            const lang = sessionId ? (vitals.lang || preSessionLang) : preSessionLang;
             const patientType = sessionId ? (vitals.patientType || 'neonatal') : preSessionPatientType;
+            const t = TRANSLATIONS[lang];
 
             useEffect(() => {
                 auth.signInAnonymously().then(cred => setUser(cred.user)).catch(() => setUser({ uid: 'guest' }));
@@ -1331,26 +1511,34 @@
                 if (p.get('mode') && p.get('session')) { setMode(p.get('mode')); setSessionId(p.get('session')); }
             }, []);
 
-            // Listener limpio: solo setVitals. patientType se deriva automáticamente de vitals.
+            // Listener limpio: solo setVitals. lang y patientType se derivan automáticamente.
+            // vitalsLoaded garantiza que control no se renderiza hasta tener datos de Firestore.
             useEffect(() => {
                 if (!sessionId || !db) return;
                 const unsub = db.collection("sessions").doc(sessionId).onSnapshot(doc => {
-                    if (doc.exists) setVitals(doc.data());
+                    if (doc.exists) { setVitals(doc.data()); setVitalsLoaded(true); }
                 });
                 return () => unsub();
             }, [sessionId]);
 
-            // Cambiar patientType: actualización optimista local + escritura a Firestore.
-            // La otra pantalla recibe el cambio vía su listener onSnapshot → setVitals.
+            useEffect(() => {
+                const defaults = PATIENT_DEFAULTS[patientType] || PATIENT_DEFAULTS.neonatal;
+                setVitals(prev => ({ ...prev, hr: defaults.hr, spo2: defaults.spo2, simRunning: false, transition: null }));
+            }, [patientType]);
+
+            // Handlers: actualización optimista + escritura a Firestore.
+            // La otra pantalla recibe el cambio vía su listener onSnapshot → setVitals → re-render.
             const handlePatientTypeChange = (type) => {
                 if (vitals.simRunning) return;
                 setVitals(prev => ({ ...prev, patientType: type }));
-                if (db && sessionId) {
-                    db.collection("sessions").doc(sessionId).set({ patientType: type }, { merge: true });
-                }
+                if (db && sessionId) db.collection("sessions").doc(sessionId).set({ patientType: type }, { merge: true });
             };
 
-            // Escritura a Firestore unificada para ControllerScreen
+            const handleLangChange = (newLang) => {
+                setVitals(prev => ({ ...prev, lang: newLang }));
+                if (db && sessionId) db.collection("sessions").doc(sessionId).set({ lang: newLang }, { merge: true });
+            };
+
             const handleUpdate = (v) => {
                 if (db && sessionId) db.collection("sessions").doc(sessionId).set(v, { merge: true });
             };
@@ -1364,7 +1552,7 @@
                         {showScanner && <QRScannerView onScan={(s) => { setMode('control'); setSessionId(s); }} onCancel={() => setShowScanner(false)} t={t} />}
 
                         <PatientTypeSelector current={preSessionPatientType} onSelect={setPreSessionPatientType} t={t} />
-                        <LanguageSelector currentLang={lang} onSelect={setLang} />
+                        <LanguageSelector currentLang={preSessionLang} onSelect={setPreSessionLang} />
 
                         <header className="mb-10">
                             <Icons.Activity className="w-16 h-16 text-green-500 mx-auto mb-4 animate-pulse"/>
@@ -1375,8 +1563,9 @@
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
                             <button onClick={() => {
-                                const initDoc = { ...DEFAULT_VITALS, patientType: preSessionPatientType };
+                                const initDoc = { ...DEFAULT_VITALS, patientType: preSessionPatientType, lang: preSessionLang };
                                 setVitals(initDoc);
+                                setVitalsLoaded(true);
                                 setSessionId(sid);
                                 setMode('monitor');
                                 if (db) db.collection("sessions").doc(sid).set(initDoc);
@@ -1389,10 +1578,14 @@
                 );
             }
 
+            if (mode === 'control' && !vitalsLoaded) {
+                return <div className="h-screen bg-black flex flex-col items-center justify-center text-green-500"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mb-4"></div><span className="font-mono text-sm tracking-widest uppercase">{t.connecting}</span></div>;
+            }
+
             return (
                 <div className="font-sans antialiased">
                     {mode === 'monitor' && <MonitorScreen sessionId={sessionId} vitals={vitals} t={t} patientType={patientType} onPatientTypeChange={handlePatientTypeChange} />}
-                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={handleUpdate} t={t} lang={lang} db={db} userId={user.uid} patientType={patientType} onPatientTypeChange={handlePatientTypeChange} />}
+                    {mode === 'control' && <ControllerScreen sessionId={sessionId} vitals={vitals} onUpdate={handleUpdate} t={t} lang={lang} db={db} userId={user.uid} patientType={patientType} onPatientTypeChange={handlePatientTypeChange} onLangChange={handleLangChange} />}
                 </div>
             );
         };
