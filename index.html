@@ -1241,36 +1241,22 @@
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/20">
-                                        <div className="bg-slate-700/30 rounded-xl p-3 border border-slate-600">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="w-7 h-7 bg-blue-700 rounded-full flex items-center justify-center text-xs font-black text-white flex-none">G</span>
-                                                <span className="font-bold text-blue-300 text-sm">Gather — Recopilación</span>
-                                            </div>
-                                            {eventLog.length > 0 && (
-                                                <div className="space-y-1 mb-2 max-h-28 overflow-y-auto">
-                                                    {eventLog.map((l, i) => <div key={i} className="text-xs text-slate-300 flex gap-2"><span className="text-slate-500 font-mono w-12 flex-none">[{l.time}]</span>{l.msg}</div>)}
+                                    <div className="flex-1 flex flex-col p-3 gap-3 bg-black/20 min-h-0">
+                                        {[
+                                            { key: 'gather', label: 'Gather — Recopilación', letter: 'G', color: 'blue', placeholder: '¿Qué observaron? ¿Qué ocurrió durante el caso?', border: 'focus:border-blue-500', ring: 'bg-blue-700', text: 'text-blue-300' },
+                                            { key: 'analyze', label: 'Analyze — Análisis/Reflexión', letter: 'A', color: 'amber', placeholder: '¿Por qué ocurrió? ¿Qué salió bien y qué mejorar?', border: 'focus:border-amber-500', ring: 'bg-amber-700', text: 'text-amber-300' },
+                                            { key: 'summarize', label: 'Summarize — Cierre/Resumen', letter: 'S', color: 'green', placeholder: 'Mensajes clave para llevar. ¿Qué aprendimos?', border: 'focus:border-green-500', ring: 'bg-green-700', text: 'text-green-300' },
+                                        ].map(({ key, label, letter, placeholder, border, ring, text }) => (
+                                            <div key={key} className="flex-1 flex flex-col bg-slate-700/30 rounded-xl border border-slate-600 overflow-hidden min-h-0">
+                                                <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-600/50 flex-none">
+                                                    <span className={`w-6 h-6 ${ring} rounded-full flex items-center justify-center text-xs font-black text-white flex-none`}>{letter}</span>
+                                                    <span className={`font-bold ${text} text-xs`}>{label}</span>
                                                 </div>
-                                            )}
-                                            <textarea value={gasNotes.gather} onChange={e => setGasNotes(p => ({ ...p, gather: e.target.value }))} placeholder="¿Qué observaron? ¿Qué ocurrió durante el caso?"
-                                                className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white text-xs outline-none focus:border-blue-500 resize-none" rows={3}/>
-                                        </div>
-                                        <div className="bg-slate-700/30 rounded-xl p-3 border border-slate-600">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="w-7 h-7 bg-amber-700 rounded-full flex items-center justify-center text-xs font-black text-white flex-none">A</span>
-                                                <span className="font-bold text-amber-300 text-sm">Analyze — Análisis/Reflexión</span>
+                                                <textarea value={gasNotes[key]} onChange={e => setGasNotes(p => ({ ...p, [key]: e.target.value }))}
+                                                    placeholder={placeholder}
+                                                    className={`flex-1 w-full bg-transparent p-3 text-white text-sm outline-none ${border} resize-none placeholder-slate-600`}/>
                                             </div>
-                                            <textarea value={gasNotes.analyze} onChange={e => setGasNotes(p => ({ ...p, analyze: e.target.value }))} placeholder="¿Por qué ocurrió? ¿Qué salió bien y qué mejorar?"
-                                                className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white text-xs outline-none focus:border-amber-500 resize-none" rows={4}/>
-                                        </div>
-                                        <div className="bg-slate-700/30 rounded-xl p-3 border border-slate-600">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="w-7 h-7 bg-green-700 rounded-full flex items-center justify-center text-xs font-black text-white flex-none">S</span>
-                                                <span className="font-bold text-green-300 text-sm">Summarize — Cierre/Resumen</span>
-                                            </div>
-                                            <textarea value={gasNotes.summarize} onChange={e => setGasNotes(p => ({ ...p, summarize: e.target.value }))} placeholder="Mensajes clave para llevar. ¿Qué aprendimos?"
-                                                className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white text-xs outline-none focus:border-green-500 resize-none" rows={4}/>
-                                        </div>
+                                        ))}
                                     </div>
                                 )}
                             </div>
